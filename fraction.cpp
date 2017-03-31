@@ -5,12 +5,12 @@ using namespace std;
 class Frac{
 private:
     signed long long quo, numer;
-    int isPeriodic;
+    int periodStart;
     unsigned long long denom;
-    void simplify();
     int remIsRepeated(int*);
     void normalize();
 public:
+    void simplify();
     Frac();
     Frac(int, int, int);
     // Setting a value 
@@ -21,16 +21,34 @@ public:
     void print(int n); 
     // Print a fraction with parameter (* - standart)
     void print(char param); 
+    // Redefined + operator for Fraction class
+    Frac operator+(const Frac&);
+    // Redefined + operator for Fraction class (with int)
+    Frac operator+(const int&);
+    // Redefined - operator for Fraction class
+    Frac operator-(const Frac&); 
+    // Redefined - operator for Fraction class (with int)
+    Frac operator-(const int&);
+    // Redefined ++ operator for Fraction class
+    Frac& operator++(int);
+    // Redefined -- operator for Fraction class
+    Frac& operator--(int);
+    // Get the reversed fraction
+    Frac& operator!();
+
 };
+
 Frac::Frac(){
     quo = numer = 0;
     denom = 1; 
 };
+
 Frac::Frac(int q, int num, int den){
-    isPeriodic = -1;
+    periodStart = -1;
     quo = q;
     numer = num;
     denom = den;
+    if (!denom) denom = 1; 
 };
 
 void Frac::normalize() {
@@ -39,8 +57,9 @@ void Frac::normalize() {
 }
 
 void Frac::simplify() {
-    if (denom != 0) {
-        quo += numer/denom;
+    if (!numer) denom = 1; 
+    if (denom) {
+        quo += numer / denom;
         numer = numer % denom;
     }
 }
@@ -62,42 +81,44 @@ void Frac::print() {
 };
 
 void Frac::print(const char param) {
-    normalize();
+    Frac toCount = Frac(quo, numer, denom);
+    toCount.normalize();
+    int remRep = 0;
     if (param == '*') {
         int power = 0;
-        while (numer >= 10*denom) {
-            denom *= 10;
+        while (toCount.numer >= 10*toCount.denom) {
+            toCount.denom *= 10;
             power++;
         }
-        while (numer < denom) {
-            numer *= 10;
+        while (toCount.numer <toCount.denom) {
+            toCount.numer *= 10;
             power--;
         }
-        int* rem = new int[denom] ();
+        int* rem = new int[toCount.denom+1] ();
         int fracToDouble[128];     
-        if (denom > 0) {
+        if (toCount.denom > 0) {
             int i = 0;
             do {
-                if (!(numer / denom)) 
-                    numer *= 10;
-                fracToDouble[i] = numer / denom;
-                cout << "we've written" << fracToDouble[i] << endl;
-                numer %= denom;
-                rem[i] = numer;
-                cout << "we've written" << rem[i] << endl;
+                if (!(toCount.numer / toCount.denom)) 
+                    toCount.numer *= 10;
+                fracToDouble[i] = toCount.numer / toCount.denom;
+                toCount.numer %= toCount.denom;
+                rem[i] = toCount.numer;
+                remRep = remIsRepeated(rem);
+                if (!rem[i]) remRep = i+1;
                 i++;
-            cout << "clause:" << remIsRepeated(rem) <<endl;
-            } while (!remIsRepeated(rem));
+            //cout << "clause:" << remIsRepeated(rem) <<endl;
+            } while (!remRep);
         }
-        for (int i = 0; i < remIsRepeated(rem); i++) {
-            if (i == isPeriodic) {
+        for (int i = 0; i < remRep; i++) {
+            if (i == periodStart) {
                 cout << '(';
             }
             cout << fracToDouble[i];
             if (i == 0) 
                 cout << '.';
         }
-        if (isPeriodic >= 0) 
+        if (periodStart >= 0) 
             cout << ')';
         cout << 'x' << 10 << '^' << power; //the quotient had been transformed to a proper form
         cout << endl;    
@@ -108,16 +129,17 @@ void Frac::print(const char param) {
 
 int Frac::remIsRepeated(int* array) {
     int i = 0;
-    int last;
+    int last = 1;
     while (array[i] != 0) {
-            last = i;
-            i++;
-        }
+        last = i;
+        i++;
+    }
+    if (!array[0]) return 1;
     //cout << "\n the last is:" << last << endl;
-    for (int i = 1; i < last; i++)
-        if (array[i] == array[last]) {
+    for (int k = 1; k < last; k++)
+        if (array[k] == array[last]) {
             //cout << "the last" << array[last-1] << endl;
-            isPeriodic = i;
+            periodStart = k;
             return last;
         }
     return 0;
@@ -145,9 +167,57 @@ void Frac::print(int n){
     cout<<endl;
 };  
 
+Frac Frac::operator+(const Frac& toAdd) {
+    Frac tmp;
+    normalize();
+    tmp.numer = (toAdd.quo * toAdd.denom + toAdd.numer) * denom + numer * toAdd.denom;
+    tmp.denom = toAdd.denom * denom;
+    cout << "numer: " << tmp.numer << ", denom: " << tmp.denom << endl;
+    tmp.simplify();
+    return tmp;
+}
+
+Frac Frac::operator+(const int& toAdd) {
+    Frac tmp(quo, numer, denom);
+    tmp.quo += toAdd;
+    return tmp;
+}
+
+Frac Frac::operator-(const Frac& toSub) { 
+    return *this + Frac(-toSub.quo, -toSub.numer, -toSub.denom);
+}
+
+Frac Frac::operator-(const int& toAdd) {
+    Frac tmp(quo, numer, denom);
+    tmp.quo -= toAdd;
+    return tmp;
+}
+
+Frac& Frac::operator++(const int iter) {
+    quo += 1;
+    return *this;
+}
+
+Frac& Frac::operator--(const int iter) {
+    quo -= 1;
+    return *this;
+}
+
 int main(){
-    Frac b(0,2,3);
+    int rem = 0, numer = 0, denom = 1;
+    cin >> rem >> numer >> denom;
+    Frac a(rem, numer, denom);
+    a.print();
+    a.print('*');
+    cin >> rem >> numer >> denom;
+    Frac b(rem, numer, denom);
     b.print();
     b.print('*');
+    Frac c;
+    c = a + 2;
+    c++;
+    c--;
+    c = c - 2;
+    c.print();
     return 0;
 }
