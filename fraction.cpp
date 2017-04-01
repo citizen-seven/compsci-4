@@ -5,34 +5,40 @@ using namespace std;
 class Frac{
 private:
     signed long long quo, numer;
-    int periodStart;
+    signed long long periodStart;
     unsigned long long denom;
-    int remIsRepeated(int*);
+    unsigned long long remIsRepeated(unsigned long long*);
     void normalize();
 public:
     void simplify();
     Frac();
-    Frac(int, int, int);
+    Frac(signed long long, signed long long, unsigned long long);
     // Setting a value 
-    void setVal(int, int, int);
+    void setVal(signed long long, signed long long, unsigned long long);
+
     // Print a common fraction
     void print();
     // Print a fraction as a decimal with n digits
-    void print(int n); 
+    void print(unsigned long long n); 
     // Print a fraction with parameter (* - standart)
     void print(char param); 
-    // Redefined + operator for Fraction class
+
+    // Redefined + operator
     Frac operator+(const Frac&);
-    // Redefined + operator for Fraction class (with int)
+    // Redefined + operator (with int)
     Frac operator+(const int&);
-    // Redefined - operator for Fraction class
-    Frac operator-(const Frac&); 
-    // Redefined - operator for Fraction class (with int)
-    Frac operator-(const int&);
-    // Redefined ++ operator for Fraction class
+    // Redefined ++ operator
     Frac& operator++(int);
-    // Redefined -- operator for Fraction class
+
+    // Redefined - operator class
+    Frac operator-(const Frac&); 
+    // Redefined - operator (with int)
+    Frac operator-(const int&);
+    // Redefined -- operator
     Frac& operator--(int);
+    
+    //Redefined * operator
+    Frac operator*(const Frac&);
     // Get the reversed fraction
     Frac& operator!();
 
@@ -43,7 +49,7 @@ Frac::Frac(){
     denom = 1; 
 };
 
-Frac::Frac(int q, int num, int den){
+Frac::Frac(signed long long q, signed long long num, unsigned long long den){
     periodStart = -1;
     quo = q;
     numer = num;
@@ -57,11 +63,18 @@ void Frac::normalize() {
 }
 
 void Frac::simplify() {
+    bool sign = 0;
+    if (numer < 0) {
+        sign = 1;
+        numer *= -1;
+    }
     if (!numer) denom = 1; 
     if (denom) {
         quo += numer / denom;
         numer = numer % denom;
     }
+    if (sign && !quo) numer *= -1;
+    if (sign && quo) quo *= -1; 
 }
 
 // "Basic" print()
@@ -83,19 +96,25 @@ void Frac::print() {
 void Frac::print(const char param) {
     Frac toCount = Frac(quo, numer, denom);
     toCount.normalize();
-    int remRep = 0;
+    unsigned long long remRep = 0;
+    bool sign = 0; //0 if positive, 1 is negative
     if (param == '*') {
+        if (toCount.numer < 0) {
+            sign = 1;
+            toCount.numer *= -1;
+        }
         int power = 0;
         while (toCount.numer >= 10*toCount.denom) {
             toCount.denom *= 10;
             power++;
         }
-        while (toCount.numer <toCount.denom) {
+        while (toCount.numer < toCount.denom) {
             toCount.numer *= 10;
             power--;
         }
-        int* rem = new int[toCount.denom+1] ();
-        int fracToDouble[128];     
+        unsigned long long* rem = new unsigned long long[toCount.denom+1] ();
+        signed long long fracToDouble[128];     
+        //cout << "numer" <<toCount.numer;
         if (toCount.denom > 0) {
             int i = 0;
             do {
@@ -110,11 +129,12 @@ void Frac::print(const char param) {
             //cout << "clause:" << remIsRepeated(rem) <<endl;
             } while (!remRep);
         }
-        for (int i = 0; i < remRep; i++) {
+        for (unsigned long long i = 0; i < remRep; i++) {
             if (i == periodStart) {
                 cout << '(';
             }
-            cout << fracToDouble[i];
+            if (sign && !i) cout << '-' << fracToDouble[i];
+            else  cout << fracToDouble[i];
             if (i == 0) 
                 cout << '.';
         }
@@ -127,16 +147,16 @@ void Frac::print(const char param) {
         this->print();
 }
 
-int Frac::remIsRepeated(int* array) {
-    int i = 0;
-    int last = 1;
+unsigned long long Frac::remIsRepeated(unsigned long long* array) {
+    signed long long i = 0;
+    signed long long last = 1;
     while (array[i] != 0) {
         last = i;
         i++;
     }
     if (!array[0]) return 1;
     //cout << "\n the last is:" << last << endl;
-    for (int k = 1; k < last; k++)
+    for (signed long long k = 1; k < last; k++)
         if (array[k] == array[last]) {
             //cout << "the last" << array[last-1] << endl;
             periodStart = k;
@@ -146,15 +166,15 @@ int Frac::remIsRepeated(int* array) {
 }
 
 // print(int n) with a parameter - n is a number of digits after a point 
-void Frac::print(int n){
-    int c = quo * denom + numer;
-    int b = denom;
-    for(int i = 0; i < n + 1; i++){
-        int pr = c / b;
+void Frac::print(unsigned long long n){
+    signed long long c = quo * denom + numer;
+    unsigned long long b = denom;
+    for(unsigned long long i = 0; i < n + 1; i++){
+        signed long long pr = c / b;
         cout<<pr;
         if (i == 0)
             cout<<'.';
-        int next = c % b;
+        signed long long next = c % b;
         next *= 10;
         while(next < b){
             next *= 10;
@@ -172,7 +192,7 @@ Frac Frac::operator+(const Frac& toAdd) {
     normalize();
     tmp.numer = (toAdd.quo * toAdd.denom + toAdd.numer) * denom + numer * toAdd.denom;
     tmp.denom = toAdd.denom * denom;
-    cout << "numer: " << tmp.numer << ", denom: " << tmp.denom << endl;
+    //cout << "numer: " << tmp.numer << ", denom: " << tmp.denom << endl;
     tmp.simplify();
     return tmp;
 }
@@ -214,7 +234,7 @@ int main(){
     b.print();
     b.print('*');
     Frac c;
-    c = a + 2;
+    c = a + b;
     c++;
     c--;
     c = c - 2;
