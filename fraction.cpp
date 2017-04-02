@@ -40,7 +40,17 @@ public:
     //Redefined * operator
     Frac operator*(const Frac&);
     // Get the reversed fraction
-    Frac& operator!();
+    Frac operator!();
+    //Redefined / operator
+    Frac operator/(const Frac&);
+
+    //Redefined comparison operators
+    bool operator>(const Frac&);
+    bool operator<(const Frac&);
+    bool operator==(const Frac&);
+    bool operator>(const signed long long);
+    bool operator<(const signed long long);
+    bool operator==(const signed long long);
 
 };
 
@@ -51,6 +61,11 @@ Frac::Frac(){
 
 Frac::Frac(signed long long q, signed long long num, unsigned long long den){
     periodStart = -1;
+    if ((q < 0) && (num < 0)) num *= -1;
+    if (numer < 0) {
+        q *= -1;
+        num *= -1;
+    }
     quo = q;
     numer = num;
     denom = den;
@@ -58,7 +73,11 @@ Frac::Frac(signed long long q, signed long long num, unsigned long long den){
 };
 
 void Frac::normalize() {
-    numer += denom*quo;
+    if ((quo < 0) || (numer < 0)) {
+        numer -= denom*quo;
+        numer *= -1;
+    }
+    else numer += denom*quo;
     quo = 0;
 }
 
@@ -204,7 +223,12 @@ Frac Frac::operator+(const int& toAdd) {
 }
 
 Frac Frac::operator-(const Frac& toSub) { 
-    return *this + Frac(-toSub.quo, -toSub.numer, -toSub.denom);
+    Frac tmp;
+    normalize();
+    tmp.numer = (numer * toSub.denom - (toSub.quo * toSub.denom + toSub.numer) * denom);
+    tmp.denom = toSub.denom * denom;
+    tmp.simplify();
+    return tmp;
 }
 
 Frac Frac::operator-(const int& toAdd) {
@@ -223,6 +247,26 @@ Frac& Frac::operator--(const int iter) {
     return *this;
 }
 
+Frac Frac::operator*(const Frac& toMul) {
+    Frac tmp(0, (toMul.quo * toMul.denom + toMul.numer) * (quo * denom + numer), denom * toMul.denom);
+    tmp.simplify();
+    return tmp;
+}
+
+Frac Frac::operator/(const Frac& toDiv) {
+    Frac tmp(0, (quo * denom + numer) * toDiv.denom, (toDiv.quo * toDiv.denom + toDiv.numer) * denom);
+    tmp.simplify();
+    return tmp;
+}
+
+Frac Frac::operator!() {
+    normalize();
+    Frac tmp(0, denom, numer);
+    simplify();
+    tmp.simplify();
+    return tmp;
+}
+
 int main(){
     int rem = 0, numer = 0, denom = 1;
     cin >> rem >> numer >> denom;
@@ -234,10 +278,7 @@ int main(){
     b.print();
     b.print('*');
     Frac c;
-    c = a + b;
-    c++;
-    c--;
-    c = c - 2;
+    c = a - b;
     c.print();
     return 0;
 }
