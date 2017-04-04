@@ -39,10 +39,12 @@ public:
     
     //Redefined * operator
     Frac operator*(const Frac&);
+    Frac operator*(const signed long long&);
     // Get the reversed fraction
     Frac operator!();
     //Redefined / operator
     Frac operator/(const Frac&);
+    Frac operator/(const signed long long&);
 
     //Redefined comparison operators
     int operator>(const Frac&);
@@ -54,18 +56,14 @@ public:
 
 };
 
-Frac::Frac(){
+Frac::Frac() {
     quo = numer = 0;
     denom = 1; 
 };
 
-Frac::Frac(signed long long q, signed long long num, unsigned long long den){
+Frac::Frac(signed long long q, signed long long num, unsigned long long den) {
     periodStart = -1;
     if ((q < 0) && (num < 0)) num *= -1;
-    if (numer < 0) {
-        q *= -1;
-        num *= -1;
-    }
     quo = q;
     numer = num;
     denom = den;
@@ -73,12 +71,18 @@ Frac::Frac(signed long long q, signed long long num, unsigned long long den){
 };
 
 void Frac::normalize() {
-    if ((quo < 0) || (numer < 0)) {
-        numer -= denom*quo;
+    bool sign = 0;
+    if (quo < 0) {
+        sign = 1;
+        quo *= -1;
+    }
+    if (numer < 0) {
+        sign = 1;
         numer *= -1;
     }
-    else numer += denom*quo;
-    quo = 0;
+    numer += denom*quo;
+    quo = 0; 
+    if (sign) numer *= -1; 
 }
 
 void Frac::simplify() {
@@ -87,11 +91,18 @@ void Frac::simplify() {
         sign = 1;
         numer *= -1;
     }
-    if (!numer) denom = 1; 
-    if (denom) {
-        quo += numer / denom;
-        numer = numer % denom;
+    normalize();
+    unsigned long long n = denom, m = numer, rem = 0;
+    while (n) {
+        rem = m % n;
+        m = n;
+        n = rem;
     }
+    denom /= m;
+    numer /= m;
+    quo += numer / denom;
+    numer = numer % denom;
+
     if (sign && !quo) numer *= -1;
     if (sign && quo) quo *= -1; 
 }
@@ -217,9 +228,7 @@ Frac Frac::operator+(const Frac& toAdd) {
 }
 
 Frac Frac::operator+(const int& toAdd) {
-    Frac tmp(quo, numer, denom);
-    tmp.quo += toAdd;
-    return tmp;
+    return *this + Frac(0, toAdd, 1);
 }
 
 Frac Frac::operator-(const Frac& toSub) { 
@@ -231,10 +240,8 @@ Frac Frac::operator-(const Frac& toSub) {
     return tmp;
 }
 
-Frac Frac::operator-(const int& toAdd) {
-    Frac tmp(quo, numer, denom);
-    tmp.quo -= toAdd;
-    return tmp;
+Frac Frac::operator-(const int& toSub) {
+    return *this - Frac(0, toSub, 1);
 }
 
 Frac& Frac::operator++(const int iter) {
@@ -253,10 +260,29 @@ Frac Frac::operator*(const Frac& toMul) {
     return tmp;
 }
 
+Frac Frac::operator*(const signed long long& toMul) {
+    normalize();
+    numer *= toMul;
+    simplify();
+    return *this;
+}
+
 Frac Frac::operator/(const Frac& toDiv) {
     Frac tmp(0, (quo * denom + numer) * toDiv.denom, (toDiv.quo * toDiv.denom + toDiv.numer) * denom);
     tmp.simplify();
     return tmp;
+}
+
+Frac Frac::operator/(const signed long long& toDiv) {
+    if (toDiv) {
+        normalize();
+        denom *= toDiv;
+        simplify();
+    } else {
+        cout << "Zero divizion" << endl;
+        exit(-1);
+    }
+    return *this;
 }
 
 Frac Frac::operator!() {
@@ -294,7 +320,33 @@ int Frac::operator==(const signed long long& toComp) {
     return (quo + (long double)numer / (long double)denom == toComp);
 }
 
+void climb() {
+    unsigned long long n = 0, k = 0;
+    int m = 0;
+    cin >> n >> k >> m;
+    Frac height(0, 1, 1), currentHeight;
+    Frac toClimb, toSlide;
+    for (int i = 0; i < m; i++) {
+        toClimb = (currentHeight - 1) * (-1) / (n);
+        toSlide = (currentHeight - toClimb) / k;
+        if (toSlide < 0) toSlide = toSlide * (-1);
+        currentHeight = currentHeight + toClimb - toSlide;
+        /*cout << "toClimb: "; 
+        toClimb.print();
+        cout << "toSlide: ";
+        toSlide.print();
+        cout << "currentHeight: ";
+        currentHeight.print();*/
+        if (i == m-1) {
+            height = !((currentHeight - 1) * (-1));
+            cout << "The Mountain height is: ";
+            height.print();
+        }
+     }
+} 
+
 int main() {
+    //some tests
     int rem = 0, numer = 0, denom = 1;
     cin >> rem >> numer >> denom;
     Frac a(rem, numer, denom);
@@ -304,14 +356,19 @@ int main() {
     Frac b(rem, numer, denom);
     b.print();
     b.print('*');
-    if (a > b) cout << "more" << endl;
-    if (a < b) cout << "less" << endl;
-    if (a == b) cout << "equal" << endl;
-    if (a > 2) cout << "more" << endl;
-    if (a < 2) cout << "less" << endl;
-    if (a == 2) cout << "equal" << endl;
-    //Frac c;
-    //c = !a;
-    //c.print();
+    if (a > b) cout << "first is greater" << endl;
+    if (a < b) cout << "first is smaller" << endl;
+    if (a == b) cout << "fractions are equal" << endl;
+    if (a > 2) cout << "first is greater than 2" << endl;
+    if (a < 2) cout << "second is smaller than 2" << endl;
+    if (a == 2) cout << "first is 2" << endl;
+    Frac c;
+    c = !a;
+    c.print();
+
+
+    //Task 3
+    climb(); 
+    
     return 0;
 }
