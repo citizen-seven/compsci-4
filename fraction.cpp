@@ -45,12 +45,12 @@ public:
     Frac operator/(const Frac&);
 
     //Redefined comparison operators
-    bool operator>(const Frac&);
-    bool operator<(const Frac&);
-    bool operator==(const Frac&);
-    bool operator>(const signed long long);
-    bool operator<(const signed long long);
-    bool operator==(const signed long long);
+    int operator>(const Frac&);
+    int operator<(const Frac&);
+    int operator==(const Frac&);
+    int operator>(const signed long long&);
+    int operator<(const signed long long&);
+    int operator==(const signed long long&);
 
 };
 
@@ -267,7 +267,34 @@ Frac Frac::operator!() {
     return tmp;
 }
 
-int main(){
+int Frac::operator<(const Frac& toComp) {
+    return (quo + (long double)numer / (long double)denom < toComp.quo +
+            (long double)toComp.numer / (long double)toComp.denom);
+}
+
+int Frac::operator>(const Frac& toComp) {
+    return (quo + (long double)numer / (long double)denom > toComp.quo +
+            (long double)toComp.numer / (long double)toComp.denom);
+}
+
+int Frac::operator==(const Frac& toComp) {
+    return (quo + (long double)numer / (long double)denom == toComp.quo +
+            (long double)toComp.numer / (long double)toComp.denom);
+}
+
+int Frac::operator<(const signed long long& toComp) {
+    return (quo + (long double)numer / (long double)denom < toComp);
+}
+
+int Frac::operator>(const signed long long& toComp) {
+    return (quo + (long double)numer / (long double)denom > toComp);
+}
+
+int Frac::operator==(const signed long long& toComp) {
+    return (quo + (long double)numer / (long double)denom == toComp);
+}
+
+int main() {
     int rem = 0, numer = 0, denom = 1;
     cin >> rem >> numer >> denom;
     Frac a(rem, numer, denom);
@@ -277,8 +304,14 @@ int main(){
     Frac b(rem, numer, denom);
     b.print();
     b.print('*');
-    Frac c;
-    c = a - b;
-    c.print();
+    if (a > b) cout << "more" << endl;
+    if (a < b) cout << "less" << endl;
+    if (a == b) cout << "equal" << endl;
+    if (a > 2) cout << "more" << endl;
+    if (a < 2) cout << "less" << endl;
+    if (a == 2) cout << "equal" << endl;
+    //Frac c;
+    //c = !a;
+    //c.print();
     return 0;
 }
