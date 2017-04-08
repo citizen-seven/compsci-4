@@ -351,21 +351,26 @@ int main() {
     cin >> rem >> numer >> denom;
     Frac a(rem, numer, denom);
     a.print();
-    a.print('*');
     cin >> rem >> numer >> denom;
     Frac b(rem, numer, denom);
     b.print();
-    b.print('*');
     if (a > b) cout << "first is greater" << endl;
     if (a < b) cout << "first is smaller" << endl;
     if (a == b) cout << "fractions are equal" << endl;
     if (a > 2) cout << "first is greater than 2" << endl;
     if (a < 2) cout << "second is smaller than 2" << endl;
     if (a == 2) cout << "first is 2" << endl;
-    Frac c;
-    c = !a;
-    c.print();
+    cout << "Sum is: ";
+    (a + b).print();
 
+    cout << "Differrence is: ";
+    (a - b).print();
+    
+    cout << "Mult is: ";
+    (a * b).print();
+
+    cout << "Div is: ";
+    (a / b).print();
 
     //Task 3
     climb(); 
