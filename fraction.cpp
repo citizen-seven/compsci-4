@@ -1,58 +1,53 @@
 #include <iostream>
+#include <exception>
 #include <cstdlib>
+#include <cstdint>
 using namespace std;
 
 class Frac{
 private:
-    signed long long quo, numer;
-    signed long long periodStart;
-    unsigned long long denom;
-    unsigned long long remIsRepeated(unsigned long long*);
+    int64_t quo, numer;
+    int64_t periodStart;
+    uint64_t denom;
+    uint64_t remIsRepeated(uint64_t*);
     void normalize();
 public:
     void simplify();
     Frac();
-    Frac(signed long long, signed long long, unsigned long long);
+    Frac(int64_t);
+    Frac(int64_t, int64_t, uint64_t);
     // Setting a value 
-    void setVal(signed long long, signed long long, unsigned long long);
+    void setVal(int64_t, int64_t, uint64_t);
 
     // Print a common fraction
     void print();
     // Print a fraction as a decimal with n digits
-    void print(unsigned long long n); 
+    void print(uint64_t n); 
     // Print a fraction with parameter (* - standart)
     void print(char param); 
 
     // Redefined + operator
     Frac operator+(const Frac&);
-    // Redefined + operator (with int)
-    Frac operator+(const int&);
     // Redefined ++ operator
-    Frac& operator++(int);
+    Frac& operator++(); //++Frac
+    Frac operator++(int); //Frac++
 
     // Redefined - operator class
     Frac operator-(const Frac&); 
-    // Redefined - operator (with int)
-    Frac operator-(const int&);
     // Redefined -- operator
     Frac& operator--(int);
     
     //Redefined * operator
     Frac operator*(const Frac&);
-    Frac operator*(const signed long long&);
     // Get the reversed fraction
     Frac operator!();
     //Redefined / operator
     Frac operator/(const Frac&);
-    Frac operator/(const signed long long&);
 
     //Redefined comparison operators
     int operator>(const Frac&);
     int operator<(const Frac&);
     int operator==(const Frac&);
-    int operator>(const signed long long&);
-    int operator<(const signed long long&);
-    int operator==(const signed long long&);
 
 };
 
@@ -61,14 +56,31 @@ Frac::Frac() {
     denom = 1; 
 };
 
-Frac::Frac(signed long long q, signed long long num, unsigned long long den) {
+Frac::Frac(int64_t q) {
     periodStart = -1;
+    quo = q;
+    numer = 0;
+    denom = 1;
+}
+
+Frac::Frac(int64_t q, int64_t num, uint64_t den) {
+    periodStart = -1;
+    if (!den) throw overflow_error("Denumerator can't be zero");
     if ((q < 0) && (num < 0)) num *= -1;
     quo = q;
     numer = num;
     denom = den;
-    if (!denom) denom = 1; 
 };
+
+void Frac::setVal(int64_t q, int64_t num, uint64_t den) {
+    periodStart = -1;
+    if (!den) throw overflow_error("Denumerator can't be zero");
+    if ((q < 0) && (num < 0)) num *= -1;
+    quo = q;
+    numer = num;
+    denom = den;
+};
+
 
 void Frac::normalize() {
     bool sign = 0;
@@ -87,12 +99,12 @@ void Frac::normalize() {
 
 void Frac::simplify() {
     bool sign = 0;
+    normalize();
     if (numer < 0) {
         sign = 1;
         numer *= -1;
     }
-    normalize();
-    unsigned long long n = denom, m = numer, rem = 0;
+    uint64_t n = denom, m = numer, rem = 0;
     while (n) {
         rem = m % n;
         m = n;
@@ -102,14 +114,13 @@ void Frac::simplify() {
     numer /= m;
     quo += numer / denom;
     numer = numer % denom;
-
     if (sign && !quo) numer *= -1;
     if (sign && quo) quo *= -1; 
 }
 
 // "Basic" print()
 void Frac::print() {
-    this->simplify();
+    simplify();
     if (quo == 0) {
         if (denom == 1)
             cout << numer << endl;
@@ -126,7 +137,7 @@ void Frac::print() {
 void Frac::print(const char param) {
     Frac toCount = Frac(quo, numer, denom);
     toCount.normalize();
-    unsigned long long remRep = 0;
+    uint64_t remRep = 0;
     bool sign = 0; //0 if positive, 1 is negative
     if (param == '*') {
         if (toCount.numer < 0) {
@@ -142,8 +153,8 @@ void Frac::print(const char param) {
             toCount.numer *= 10;
             power--;
         }
-        unsigned long long* rem = new unsigned long long[toCount.denom+1] ();
-        signed long long fracToDouble[128];     
+        uint64_t* rem = new uint64_t[toCount.denom+1] ();
+        int64_t fracToDouble[128];     
         //cout << "numer" <<toCount.numer;
         if (toCount.denom > 0) {
             int i = 0;
@@ -159,7 +170,7 @@ void Frac::print(const char param) {
             //cout << "clause:" << remIsRepeated(rem) <<endl;
             } while (!remRep);
         }
-        for (unsigned long long i = 0; i < remRep; i++) {
+        for (uint64_t i = 0; i < remRep; i++) {
             if (i == periodStart) {
                 cout << '(';
             }
@@ -177,16 +188,16 @@ void Frac::print(const char param) {
         this->print();
 }
 
-unsigned long long Frac::remIsRepeated(unsigned long long* array) {
-    signed long long i = 0;
-    signed long long last = 1;
+uint64_t Frac::remIsRepeated(uint64_t* array) {
+    int64_t i = 0;
+    int64_t last = 1;
     while (array[i] != 0) {
         last = i;
         i++;
     }
     if (!array[0]) return 1;
     //cout << "\n the last is:" << last << endl;
-    for (signed long long k = 1; k < last; k++)
+    for (int64_t k = 1; k < last; k++)
         if (array[k] == array[last]) {
             //cout << "the last" << array[last-1] << endl;
             periodStart = k;
@@ -196,15 +207,15 @@ unsigned long long Frac::remIsRepeated(unsigned long long* array) {
 }
 
 // print(int n) with a parameter - n is a number of digits after a point 
-void Frac::print(unsigned long long n){
-    signed long long c = quo * denom + numer;
-    unsigned long long b = denom;
-    for(unsigned long long i = 0; i < n + 1; i++){
-        signed long long pr = c / b;
+void Frac::print(uint64_t n){
+    int64_t c = quo * denom + numer;
+    uint64_t b = denom;
+    for(uint64_t i = 0; i < n + 1; i++){
+        int64_t pr = c / b;
         cout<<pr;
         if (i == 0)
             cout<<'.';
-        signed long long next = c % b;
+        int64_t next = c % b;
         next *= 10;
         while(next < b){
             next *= 10;
@@ -227,12 +238,12 @@ Frac Frac::operator+(const Frac& toAdd) {
     return tmp;
 }
 
-Frac Frac::operator+(const int& toAdd) {
+/*Frac Frac::operator+(const int& toAdd) {
     return *this + Frac(0, toAdd, 1);
-}
+}*/
 
 Frac Frac::operator-(const Frac& toSub) { 
-    Frac tmp;
+    Frac tmp(0, 0, 1);
     normalize();
     tmp.numer = (numer * toSub.denom - (toSub.quo * toSub.denom + toSub.numer) * denom);
     tmp.denom = toSub.denom * denom;
@@ -240,13 +251,15 @@ Frac Frac::operator-(const Frac& toSub) {
     return tmp;
 }
 
-Frac Frac::operator-(const int& toSub) {
-    return *this - Frac(0, toSub, 1);
-}
-
-Frac& Frac::operator++(const int iter) {
+Frac& Frac::operator++() {
     quo += 1;
     return *this;
+}
+
+Frac Frac::operator++(int) {
+    Frac temp = *this;
+    quo += 1;
+    return temp;
 }
 
 Frac& Frac::operator--(const int iter) {
@@ -260,29 +273,12 @@ Frac Frac::operator*(const Frac& toMul) {
     return tmp;
 }
 
-Frac Frac::operator*(const signed long long& toMul) {
-    normalize();
-    numer *= toMul;
-    simplify();
-    return *this;
-}
-
 Frac Frac::operator/(const Frac& toDiv) {
+    if (!(toDiv.quo * toDiv.denom + toDiv.numer))
+        throw overflow_error("Zero division error");
     Frac tmp(0, (quo * denom + numer) * toDiv.denom, (toDiv.quo * toDiv.denom + toDiv.numer) * denom);
     tmp.simplify();
     return tmp;
-}
-
-Frac Frac::operator/(const signed long long& toDiv) {
-    if (toDiv) {
-        normalize();
-        denom *= toDiv;
-        simplify();
-    } else {
-        cout << "Zero divizion" << endl;
-        exit(-1);
-    }
-    return *this;
 }
 
 Frac Frac::operator!() {
@@ -308,20 +304,8 @@ int Frac::operator==(const Frac& toComp) {
             (long double)toComp.numer / (long double)toComp.denom);
 }
 
-int Frac::operator<(const signed long long& toComp) {
-    return (quo + (long double)numer / (long double)denom < toComp);
-}
-
-int Frac::operator>(const signed long long& toComp) {
-    return (quo + (long double)numer / (long double)denom > toComp);
-}
-
-int Frac::operator==(const signed long long& toComp) {
-    return (quo + (long double)numer / (long double)denom == toComp);
-}
-
 void climb() {
-    unsigned long long n = 0, k = 0;
+    uint64_t n = 0, k = 0;
     int m = 0;
     cin >> n >> k >> m;
     Frac height(0, 1, 1), currentHeight;
@@ -347,21 +331,33 @@ void climb() {
 
 int main() {
     //some tests
-    int rem = 0, numer = 0, denom = 1;
+    int64_t rem = 0, numer = 0;
+    uint64_t denom = 1;
     cin >> rem >> numer >> denom;
-    Frac a(rem, numer, denom);
+    Frac a, b;
+    try {
+        a.setVal(rem, numer, denom);
+    } catch (overflow_error e) {
+        cout << e.what() << endl;
+        exit(1);
+    }
     a.print();
     cin >> rem >> numer >> denom;
-    Frac b(rem, numer, denom);
+    try {
+        b.setVal(rem, numer, denom);
+    } catch (overflow_error e) {
+        cout << e.what() << endl;
+        exit(1);
+    }
     b.print();
     if (a > b) cout << "first is greater" << endl;
     if (a < b) cout << "first is smaller" << endl;
     if (a == b) cout << "fractions are equal" << endl;
     if (a > 2) cout << "first is greater than 2" << endl;
-    if (a < 2) cout << "second is smaller than 2" << endl;
+    if (a < 2) cout << "first is smaller than 2" << endl;
     if (a == 2) cout << "first is 2" << endl;
     cout << "Sum is: ";
-    (a + b).print();
+    (a + 1).print();
 
     cout << "Differrence is: ";
     (a - b).print();
@@ -369,11 +365,21 @@ int main() {
     cout << "Mult is: ";
     (a * b).print();
 
-    cout << "Div is: ";
-    (a / b).print();
+    try {
+        cout << "Div is: ";
+        (a / b).print();
+    } catch (overflow_error e) {
+        cout << e.what() << endl;
+        exit(1);
+    }
+    cout << "++Frac is: ";
+    (a++).print();
+
+    cout << "Frac++ is: ";
+    (++a).print();
 
     //Task 3
-    climb(); 
+    //climb(); 
     
     return 0;
 }
