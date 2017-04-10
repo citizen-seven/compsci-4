@@ -13,6 +13,7 @@ public:
     void simplify();
     Frac();
     Frac(signed long long, signed long long, unsigned long long);
+    Frac(signed long long);
     // Setting a value 
     void setVal(signed long long, signed long long, unsigned long long);
 
@@ -25,34 +26,25 @@ public:
 
     // Redefined + operator
     Frac operator+(const Frac&);
-    // Redefined + operator (with int)
-    Frac operator+(const int&);
     // Redefined ++ operator
     Frac& operator++(int);
 
     // Redefined - operator class
     Frac operator-(const Frac&); 
-    // Redefined - operator (with int)
-    Frac operator-(const int&);
     // Redefined -- operator
     Frac& operator--(int);
     
     //Redefined * operator
     Frac operator*(const Frac&);
-    Frac operator*(const signed long long&);
     // Get the reversed fraction
     Frac operator!();
     //Redefined / operator
     Frac operator/(const Frac&);
-    Frac operator/(const signed long long&);
 
     //Redefined comparison operators
     int operator>(const Frac&);
     int operator<(const Frac&);
     int operator==(const Frac&);
-    int operator>(const signed long long&);
-    int operator<(const signed long long&);
-    int operator==(const signed long long&);
 
 };
 
@@ -68,6 +60,13 @@ Frac::Frac(signed long long q, signed long long num, unsigned long long den) {
     numer = num;
     denom = den;
     if (!denom) denom = 1; 
+};
+
+Frac::Frac(signed long long q) {
+    periodStart = -1;
+    quo = q;
+    numer = 0;
+    denom = 1;
 };
 
 void Frac::normalize() {
@@ -227,10 +226,6 @@ Frac Frac::operator+(const Frac& toAdd) {
     return tmp;
 }
 
-Frac Frac::operator+(const int& toAdd) {
-    return *this + Frac(0, toAdd, 1);
-}
-
 Frac Frac::operator-(const Frac& toSub) { 
     Frac tmp;
     normalize();
@@ -238,10 +233,6 @@ Frac Frac::operator-(const Frac& toSub) {
     tmp.denom = toSub.denom * denom;
     tmp.simplify();
     return tmp;
-}
-
-Frac Frac::operator-(const int& toSub) {
-    return *this - Frac(0, toSub, 1);
 }
 
 Frac& Frac::operator++(const int iter) {
@@ -260,29 +251,10 @@ Frac Frac::operator*(const Frac& toMul) {
     return tmp;
 }
 
-Frac Frac::operator*(const signed long long& toMul) {
-    normalize();
-    numer *= toMul;
-    simplify();
-    return *this;
-}
-
 Frac Frac::operator/(const Frac& toDiv) {
     Frac tmp(0, (quo * denom + numer) * toDiv.denom, (toDiv.quo * toDiv.denom + toDiv.numer) * denom);
     tmp.simplify();
     return tmp;
-}
-
-Frac Frac::operator/(const signed long long& toDiv) {
-    if (toDiv) {
-        normalize();
-        denom *= toDiv;
-        simplify();
-    } else {
-        cout << "Zero divizion" << endl;
-        exit(-1);
-    }
-    return *this;
 }
 
 Frac Frac::operator!() {
@@ -306,18 +278,6 @@ int Frac::operator>(const Frac& toComp) {
 int Frac::operator==(const Frac& toComp) {
     return (quo + (long double)numer / (long double)denom == toComp.quo +
             (long double)toComp.numer / (long double)toComp.denom);
-}
-
-int Frac::operator<(const signed long long& toComp) {
-    return (quo + (long double)numer / (long double)denom < toComp);
-}
-
-int Frac::operator>(const signed long long& toComp) {
-    return (quo + (long double)numer / (long double)denom > toComp);
-}
-
-int Frac::operator==(const signed long long& toComp) {
-    return (quo + (long double)numer / (long double)denom == toComp);
 }
 
 void climb() {
