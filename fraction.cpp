@@ -45,9 +45,9 @@ public:
     Frac operator/(const Frac&);
 
     //Redefined comparison operators
-    int operator>(const Frac&);
-    int operator<(const Frac&);
-    int operator==(const Frac&);
+    bool operator>(const Frac&);
+    bool operator<(const Frac&);
+    bool operator==(const Frac&);
 
 };
 
@@ -289,17 +289,17 @@ Frac Frac::operator!() {
     return tmp;
 }
 
-int Frac::operator<(const Frac& toComp) {
+bool Frac::operator<(const Frac& toComp) {
     return (quo + (long double)numer / (long double)denom < toComp.quo +
             (long double)toComp.numer / (long double)toComp.denom);
 }
 
-int Frac::operator>(const Frac& toComp) {
+bool Frac::operator>(const Frac& toComp) {
     return (quo + (long double)numer / (long double)denom > toComp.quo +
             (long double)toComp.numer / (long double)toComp.denom);
 }
 
-int Frac::operator==(const Frac& toComp) {
+bool Frac::operator==(const Frac& toComp) {
     return (quo + (long double)numer / (long double)denom == toComp.quo +
             (long double)toComp.numer / (long double)toComp.denom);
 }
