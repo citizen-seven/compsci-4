@@ -20,11 +20,7 @@ public:
     void setVal(int64_t, int64_t, uint64_t);
 
     // Print a common fraction
-    void print();
-    // Print a fraction as a decimal with n digits
-    void print(uint64_t n); 
-    // Print a fraction with parameter (* - standart)
-    void print(char param); 
+    void print(int64_t);
 
     // Redefined + operator
     Frac operator+(const Frac&);
@@ -119,27 +115,25 @@ void Frac::simplify() {
 }
 
 // "Basic" print()
-void Frac::print() {
-    simplify();
-    if (quo == 0) {
-        if (denom == 1)
-            cout << numer << endl;
-        else if (numer != 0)
-            cout << numer << '/' << denom << endl;
-    } else { 
-        if (denom == 1)
-            cout << quo << endl;
-        else if (numer != 0)
-            cout << quo << " (" << numer << '/' << denom << ')' << endl;
-    }
-};
-
-void Frac::print(const char param) {
-    Frac toCount = Frac(quo, numer, denom);
-    toCount.normalize();
-    uint64_t remRep = 0;
-    bool sign = 0; //0 if positive, 1 is negative
-    if (param == '*') {
+void Frac::print(int64_t mode = 0) {
+    if (!mode) {
+        simplify();
+        if (quo == 0) {
+            if (denom == 1)
+                cout << numer << endl;
+            else if (numer != 0)
+                cout << numer << '/' << denom << endl;
+        } else { 
+            if (denom == 1)
+                cout << quo << endl;
+            else if (numer != 0)
+                cout << quo << " (" << numer << '/' << denom << ')' << endl;
+        }
+    } else if (mode < 0) {
+        Frac toCount = Frac(quo, numer, denom);
+        toCount.normalize();
+        uint64_t remRep = 0;
+        bool sign = 0; //0 if positive, 1 is negative
         if (toCount.numer < 0) {
             sign = 1;
             toCount.numer *= -1;
@@ -184,9 +178,27 @@ void Frac::print(const char param) {
         cout << 'x' << 10 << '^' << power; //the quotient had been transformed to a proper form
         cout << endl;    
         delete[] rem;
-    } else 
-        this->print();
-}
+    } else {
+        int64_t c = quo * denom + numer;
+        uint64_t b = denom;
+        for (uint64_t i = 0; i < mode + 1; i++) {
+            int64_t pr = c / b;
+            cout << pr;
+            if (i == 0)
+                cout << '.';
+            int64_t next = c % b;
+            next *= 10;
+            while (next < b) {
+                next *= 10;
+                i++;
+                if (next >= b || i>=mode) break;
+                cout<<'0'; 
+            }
+            c = next;
+        }
+        cout << endl;
+    }
+};
 
 uint64_t Frac::remIsRepeated(uint64_t* array) {
     int64_t i = 0;
@@ -207,26 +219,6 @@ uint64_t Frac::remIsRepeated(uint64_t* array) {
 }
 
 // print(int n) with a parameter - n is a number of digits after a point 
-void Frac::print(uint64_t n){
-    int64_t c = quo * denom + numer;
-    uint64_t b = denom;
-    for(uint64_t i = 0; i < n + 1; i++){
-        int64_t pr = c / b;
-        cout<<pr;
-        if (i == 0)
-            cout<<'.';
-        int64_t next = c % b;
-        next *= 10;
-        while(next < b){
-            next *= 10;
-            i++;
-            if (next >= b || i>=n) break;
-            cout<<'0'; 
-        }
-        c = next;
-    }
-    cout<<endl;
-};  
 
 Frac Frac::operator+(const Frac& toAdd) {
     Frac tmp;
