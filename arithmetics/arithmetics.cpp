@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdio.h>
+#include <cmath>
 #include <cstdlib>
 #include "tools.h"
 
@@ -72,9 +73,12 @@ Arithmetic& Arithmetic::operator=(const Arithmetic& a){
 
 Arithmetic& Arithmetic::operator=(int a){
     delete[] digit;
-    digit = new unsigned char;
-    n = 1;
-    digit[0] = a;
+    n = (int)ceil(log(a)/log(100));
+    digit = new unsigned char [n];
+    for (int i = 0; i < n; i++) {
+        digit[i] = a % 100;
+        a /= 100;
+    }
     return *this;
 };
 
@@ -89,7 +93,7 @@ int main() {
     Arithmetic d;
     d = c;
     d.print();
-    c = 5;
+    c = 21124;
     c.print();
     return 0;
 }
