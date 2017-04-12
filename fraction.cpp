@@ -42,8 +42,11 @@ public:
 
     //Redefined comparison operators
     bool operator>(const Frac&);
+    bool operator>=(const Frac&);
     bool operator<(const Frac&);
+    bool operator<=(const Frac&);
     bool operator==(const Frac&);
+    bool operator!=(const Frac&);
 
 };
 
@@ -114,7 +117,7 @@ void Frac::simplify() {
     if (sign && quo) quo *= -1; 
 }
 
-// "Basic" print()
+// Print uses n as the optional parameter, n = -1: standard mode, n > 0: prints n decimal values
 void Frac::print(int64_t mode = 0) {
     if (!mode) {
         simplify();
@@ -286,13 +289,28 @@ bool Frac::operator<(const Frac& toComp) {
             (long double)toComp.numer / (long double)toComp.denom);
 }
 
+bool Frac::operator<=(const Frac& toComp) {
+    return (quo + (long double)numer / (long double)denom <= toComp.quo +
+            (long double)toComp.numer / (long double)toComp.denom);
+}
+
 bool Frac::operator>(const Frac& toComp) {
     return (quo + (long double)numer / (long double)denom > toComp.quo +
             (long double)toComp.numer / (long double)toComp.denom);
 }
 
+bool Frac::operator>=(const Frac& toComp) {
+    return (quo + (long double)numer / (long double)denom >= toComp.quo +
+            (long double)toComp.numer / (long double)toComp.denom);
+}
+
 bool Frac::operator==(const Frac& toComp) {
     return (quo + (long double)numer / (long double)denom == toComp.quo +
+            (long double)toComp.numer / (long double)toComp.denom);
+}
+
+bool Frac::operator!=(const Frac& toComp) {
+    return (quo + (long double)numer / (long double)denom != toComp.quo +
             (long double)toComp.numer / (long double)toComp.denom);
 }
 
@@ -345,6 +363,9 @@ int main() {
     if (a > b) cout << "first is greater" << endl;
     if (a < b) cout << "first is smaller" << endl;
     if (a == b) cout << "fractions are equal" << endl;
+    if (a >= b) cout << "first is not smaller" << endl;
+    if (a <= b) cout << "first is not greater" << endl;
+    if (a != b) cout << "fractions are not equal" << endl;
     if (a > 2) cout << "first is greater than 2" << endl;
     if (a < 2) cout << "first is smaller than 2" << endl;
     if (a == 2) cout << "first is 2" << endl;
