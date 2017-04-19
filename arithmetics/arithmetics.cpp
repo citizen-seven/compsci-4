@@ -6,17 +6,23 @@
 
 using namespace std;
 
-class Arithmetic{
+class Arithmetic {
     unsigned char* digit;
     int n;
-  
 public:
     Arithmetic();
     Arithmetic(const char*); 
     ~Arithmetic();
     Arithmetic(const Arithmetic&);
     Arithmetic& operator=(const Arithmetic&);
-    Arithmetic& operator=(int n);
+    Arithmetic& operator=(int);
+    Arithmetic& operator=(float);
+	Arithmetic operator+(const Arithmetic&);
+	Arithmetic operator+(int);    
+    Arithmetic& operator+=(const Arithmetic&);
+    Arithmetic operator-(const Arithmetic&);
+    Arithmetic operator-(int);
+    Arithmetic operator*(int);
     void print();
 };
 
@@ -31,7 +37,7 @@ Arithmetic::Arithmetic() {
 Arithmetic::Arithmetic(const char* s) {
     int i;
     int len = strlen(s);
-    n = ( len % 2 )? (len >> 1) + 1: len >> 1;
+    n = (len % 2) ? (len >> 1) + 1: len >> 1;
     digit = new unsigned char[n];
     len--;
     
@@ -41,6 +47,26 @@ Arithmetic::Arithmetic(const char* s) {
         digit[i] += (s[len--] - '0') * 10;
    }
 };
+
+
+Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
+    Arithmetic temp;
+    int mem = 0;
+    temp.n = (n > toSum.n) ? n : toSum.n;
+    for (int i = 0; i < temp.n; i++) {
+        int sum = (int)toSum.digit[i] + (int)digit[i] + mem;
+        mem = 0;
+        if (sum < 100) 
+            temp.digit[i] = sum;
+        else {
+            mem = 1;
+            temp.digit[i] = sum % 100;
+        }
+        if (mem && i == temp.n - 1) 
+            temp.n++;
+    }   
+    return temp;
+}
 
 void Arithmetic::print() {
     int i;
@@ -84,8 +110,10 @@ Arithmetic& Arithmetic::operator=(int a){
 
 int main() {
     Arithmetic *a = new Arithmetic();
-    Arithmetic b("12359");
-    Arithmetic c(b);
+    Arithmetic b("125123995");
+    Arithmetic c("9859218223237");
+    (b + c).print();
+    /*Arithmetic c(b);
     a->print();
     delete a;
     b.print();
@@ -94,6 +122,6 @@ int main() {
     d = c;
     d.print();
     c = 21124;
-    c.print();
+    c.print();*/
     return 0;
 }
