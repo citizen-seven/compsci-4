@@ -1,6 +1,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <cmath>
+#include <string>
+#include <cstring>
 #include <cstdlib>
 #include "tools.h"
 
@@ -52,7 +54,8 @@ Arithmetic::Arithmetic(const char* s) {
 Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
     Arithmetic temp;
     int mem = 0;
-    temp.n = (n > toSum.n) ? n : toSum.n;
+    temp.n = (n > toSum.n) ? n + 1 : toSum.n + 1;
+    temp.digit = new unsigned char[temp.n];
     for (int i = 0; i < temp.n; i++) {
         int sum = (int)toSum.digit[i] + (int)digit[i] + mem;
         mem = 0;
@@ -62,8 +65,6 @@ Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
             mem = 1;
             temp.digit[i] = sum % 100;
         }
-        if (mem && i == temp.n - 1) 
-            temp.n++;
     }   
     return temp;
 }
@@ -109,9 +110,12 @@ Arithmetic& Arithmetic::operator=(int a){
 };
 
 int main() {
-    Arithmetic *a = new Arithmetic();
-    Arithmetic b("125123995");
-    Arithmetic c("9859218223237");
+    //Arithmetic *a = new Arithmetic();
+    string input;
+    cin >> input;
+    Arithmetic b(input.c_str());
+    cin >> input;
+    Arithmetic c(input.c_str());
     (b + c).print();
     /*Arithmetic c(b);
     a->print();
