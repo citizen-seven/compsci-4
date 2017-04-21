@@ -69,6 +69,10 @@ Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
     return temp;
 }
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 void Arithmetic::print() {
     int i;
     PRINT("len = %d", n)      
@@ -78,16 +82,19 @@ void Arithmetic::print() {
     cout << endl;
 };
 
+
 Arithmetic::Arithmetic(const Arithmetic& a){
     digit = new unsigned char [a.n];
     n = a.n;
     memcpy(digit,a.digit, sizeof(unsigned char)*n); 
 };
 
+
 Arithmetic::~Arithmetic(){
     delete[] digit;
     PRINT("Destructor")
 };
+
 
 Arithmetic& Arithmetic::operator=(const Arithmetic& a){
     delete[] digit;
@@ -97,6 +104,7 @@ Arithmetic& Arithmetic::operator=(const Arithmetic& a){
     memcpy(digit, a.digit, sizeof(unsigned char)*n); 
     return *this;
 };
+
 
 Arithmetic& Arithmetic::operator=(int a){
     delete[] digit;
@@ -108,6 +116,7 @@ Arithmetic& Arithmetic::operator=(int a){
     }
     return *this;
 };
+
 
 int main() {
     //Arithmetic *a = new Arithmetic();
