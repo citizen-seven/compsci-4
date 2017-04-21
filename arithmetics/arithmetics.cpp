@@ -9,23 +9,37 @@
 using namespace std;
 
 class Arithmetic {
+private:
     unsigned char* digit;
     int n;
 public:
     Arithmetic();
     Arithmetic(const char*); 
-    ~Arithmetic();
     Arithmetic(const Arithmetic&);
+    Arithmetic(long double);
+    ~Arithmetic();
     Arithmetic& operator=(const Arithmetic&);
-    Arithmetic& operator=(int);
-    Arithmetic& operator=(float);
+    //Arithmetic& operator=(int);
+    //Arithmetic& operator=(float);
 	Arithmetic operator+(const Arithmetic&);
-	Arithmetic operator+(int);    
+	Arithmetic operator+(long int);    
     Arithmetic& operator+=(const Arithmetic&);
     Arithmetic operator-(const Arithmetic&);
-    Arithmetic operator-(int);
-    Arithmetic operator*(int);
+    Arithmetic operator-(long int);
+    Arithmetic operator*(long int);
     void print();
+};
+
+
+Arithmetic::Arithmetic(long double a) { 
+    delete[] digit;
+    n = (int)ceil(log(a) / log(100));
+    digit = new unsigned char [n];
+    long int casted = a; //implicit conversion to int
+    for (int i = 0; i < n; i++) {
+        digit[i] = casted % 100;
+        casted /= 100;
+    }
 };
 
 
@@ -69,10 +83,6 @@ Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
     return temp;
 }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 void Arithmetic::print() {
     int i;
     PRINT("len = %d", n)      
@@ -83,37 +93,25 @@ void Arithmetic::print() {
 };
 
 
-Arithmetic::Arithmetic(const Arithmetic& a){
+Arithmetic::Arithmetic(const Arithmetic& a) {
     digit = new unsigned char [a.n];
     n = a.n;
     memcpy(digit,a.digit, sizeof(unsigned char)*n); 
 };
 
 
-Arithmetic::~Arithmetic(){
+Arithmetic::~Arithmetic() {
     delete[] digit;
     PRINT("Destructor")
 };
 
 
-Arithmetic& Arithmetic::operator=(const Arithmetic& a){
+Arithmetic& Arithmetic::operator=(const Arithmetic& a) {
     delete[] digit;
     digit = new unsigned char[ a.n ];
     n = a.n;
     PRINT("size = %lu", sizeof(unsigned char)*n)
     memcpy(digit, a.digit, sizeof(unsigned char)*n); 
-    return *this;
-};
-
-
-Arithmetic& Arithmetic::operator=(int a){
-    delete[] digit;
-    n = (int)ceil(log(a)/log(100));
-    digit = new unsigned char [n];
-    for (int i = 0; i < n; i++) {
-        digit[i] = a % 100;
-        a /= 100;
-    }
     return *this;
 };
 
@@ -125,6 +123,10 @@ int main() {
     Arithmetic b(input.c_str());
     cin >> input;
     Arithmetic c(input.c_str());
+    Arithmetic test(8423);
+    test.print();
+    test = 753.198;
+    test.print();
     (b + c).print();
     /*Arithmetic c(b);
     a->print();
