@@ -11,7 +11,8 @@ using namespace std;
 class Arithmetic {
 private:
     unsigned char* digit;
-    int n;
+    unsigned long long size; //current size
+    unsigned long long n; //current number of elements
 public:
     Arithmetic();
     Arithmetic(const char*); 
@@ -19,14 +20,12 @@ public:
     Arithmetic(long double);
     ~Arithmetic();
     Arithmetic& operator=(const Arithmetic&);
-    //Arithmetic& operator=(int);
-    //Arithmetic& operator=(float);
 	Arithmetic operator+(const Arithmetic&);
-	Arithmetic operator+(long int);    
+	Arithmetic operator+(long);    
     Arithmetic& operator+=(const Arithmetic&);
     Arithmetic operator-(const Arithmetic&);
-    Arithmetic operator-(long int);
-    Arithmetic operator*(long int);
+    Arithmetic operator-(long);
+    Arithmetic operator*(long);
     void print();
 };
 
@@ -40,30 +39,42 @@ Arithmetic::Arithmetic(long double a) {
         digit[i] = casted % 100;
         casted /= 100;
     }
-};
+}
 
 
 Arithmetic::Arithmetic() {
     n = 1;
-    digit = new unsigned char;
-    digit[0] = 0;
+    size = 16;
+    digit = new unsigned char[size];
+    for (int i = 0; i < size; i++) 
+        digit[i] = 0;
     PRINT("Constructor")
-};
+}
+
 
 Arithmetic::Arithmetic(const char* s) {
-    int i;
+    size = 16;
     int len = strlen(s);
     n = (len % 2) ? (len >> 1) + 1: len >> 1;
-    digit = new unsigned char[n];
+    while (size < n) 
+        size *= 2;
+    digit = new unsigned char[size];
+    for (int i = 0; i < size; i++)
+        digit[i] = 0;
     len--;
-    
-    for (i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         digit[i] = s[len--] - '0';
         if (len < 0) break;
         digit[i] += (s[len--] - '0') * 10;
    }
-};
+}
 
+/*
+unsigned char* temp = new unsigned char[size];
+memcpy(temp, digit, sizeof(unsigned char)*n); 
+delete[] digit;
+digit = temp;
+*/
 
 Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
     Arithmetic temp;
@@ -83,27 +94,34 @@ Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
     return temp;
 }
 
+
 void Arithmetic::print() {
-    int i;
+    int count = 0;
     PRINT("len = %d", n)      
-    for (i = n; i > 0; i--) {
-        cout << (int)digit[i-1] << ' ';
+    for (int i = n; i > 0; i--) {
+        if (digit[i-1] || i != n) {
+            if (!((int)digit[i-1] / 10) && count)
+                cout << '0' << (int)digit[i-1] << ' ';
+            else  
+                cout << (int)digit[i-1] << ' ';
+            count ++;
+        }
     }
     cout << endl;
-};
+}
 
 
 Arithmetic::Arithmetic(const Arithmetic& a) {
     digit = new unsigned char [a.n];
     n = a.n;
     memcpy(digit,a.digit, sizeof(unsigned char)*n); 
-};
+}
 
 
 Arithmetic::~Arithmetic() {
     delete[] digit;
     PRINT("Destructor")
-};
+}
 
 
 Arithmetic& Arithmetic::operator=(const Arithmetic& a) {
@@ -113,7 +131,7 @@ Arithmetic& Arithmetic::operator=(const Arithmetic& a) {
     PRINT("size = %lu", sizeof(unsigned char)*n)
     memcpy(digit, a.digit, sizeof(unsigned char)*n); 
     return *this;
-};
+}
 
 
 int main() {
@@ -122,6 +140,7 @@ int main() {
     cin >> input;
     Arithmetic b(input.c_str());
     cin >> input;
+    b.print();
     Arithmetic c(input.c_str());
     Arithmetic test(8423);
     test.print();
