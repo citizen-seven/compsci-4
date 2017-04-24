@@ -20,8 +20,8 @@ public:
     Arithmetic(long double);
     ~Arithmetic();
     Arithmetic& operator=(const Arithmetic&);
-	Arithmetic operator+(const Arithmetic&);
-	Arithmetic operator+(long);    
+    Arithmetic operator+(const Arithmetic&);
+    Arithmetic operator+(long);    
     Arithmetic& operator+=(const Arithmetic&);
     Arithmetic operator-(const Arithmetic&);
     Arithmetic operator-(long);
@@ -80,9 +80,18 @@ Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
     Arithmetic temp;
     int mem = 0;
     temp.n = (n > toSum.n) ? n + 1 : toSum.n + 1;
-    temp.digit = new unsigned char[temp.n];
+    temp.size = (size > toSum.size) ? size: toSum.size;
+    if (temp.n > temp.size)
+        temp.size *= 2;
+    temp.digit = new unsigned char[temp.size];
+    for (int i = 0; i < temp.size; i++)
+        temp.digit[i] = 0;
     for (int i = 0; i < temp.n; i++) {
-        int sum = (int)toSum.digit[i] + (int)digit[i] + mem;
+        int sum = mem;
+        if (i < toSum.n)        
+            sum += (int)toSum.digit[i];
+        if (i < n)
+            sum += (int)digit[i];
         mem = 0;
         if (sum < 100) 
             temp.digit[i] = sum;
@@ -112,9 +121,10 @@ void Arithmetic::print() {
 
 
 Arithmetic::Arithmetic(const Arithmetic& a) {
-    digit = new unsigned char [a.n];
+    size = a.size;
+    digit = new unsigned char [size];
     n = a.n;
-    memcpy(digit,a.digit, sizeof(unsigned char)*n); 
+    memcpy(digit, a.digit, sizeof(unsigned char)*size); 
 }
 
 
@@ -140,9 +150,9 @@ int main() {
     cin >> input;
     Arithmetic b(input.c_str());
     cin >> input;
-    b.print();
     Arithmetic c(input.c_str());
-    Arithmetic test(8423);
+    Arithmetic test(b);
+    //test = b;
     test.print();
     test = 753.198;
     test.print();
