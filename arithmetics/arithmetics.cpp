@@ -31,9 +31,9 @@ public:
 
 
 Arithmetic::Arithmetic(long double a) { 
-    delete[] digit;
+    size = 16;
     n = (int)ceil(log(a) / log(100));
-    digit = new unsigned char [n];
+    digit = new unsigned char [size];
     long int casted = a; //implicit conversion to int
     for (int i = 0; i < n; i++) {
         digit[i] = casted % 100;
