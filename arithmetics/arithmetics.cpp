@@ -1,34 +1,6 @@
-#include <iostream>
-#include <stdio.h>
-#include <cmath>
-#include <string>
-#include <cstring>
-#include <cstdlib>
-#include "tools.h"
+#include "arithmetics.h"
 
 using namespace std;
-
-class Arithmetic {
-private:
-    unsigned char* digit;
-    unsigned long long size; //current size
-    unsigned long long n; //current number of elements
-public:
-    Arithmetic();
-    Arithmetic(const char*); 
-    Arithmetic(const Arithmetic&);
-    Arithmetic(long double);
-    ~Arithmetic();
-    Arithmetic& operator=(const Arithmetic&);
-    Arithmetic operator+(const Arithmetic&);
-    Arithmetic operator+(long);    
-    Arithmetic& operator+=(const Arithmetic&);
-    Arithmetic operator-(const Arithmetic&);
-    Arithmetic operator-(long);
-    Arithmetic operator*(long);
-    void print();
-};
-
 
 Arithmetic::Arithmetic(long double a) { 
     size = 16;
@@ -143,29 +115,21 @@ Arithmetic& Arithmetic::operator=(const Arithmetic& a) {
     return *this;
 }
 
-
-int main() {
-    //Arithmetic *a = new Arithmetic();
-    string input;
-    cin >> input;
-    Arithmetic b(input.c_str());
-    cin >> input;
-    Arithmetic c(input.c_str());
-    Arithmetic test(b);
-    //test = b;
-    test.print();
-    test = 753.198;
-    test.print();
-    (b + c).print();
-    /*Arithmetic c(b);
-    a->print();
-    delete a;
-    b.print();
-    c.print();
-    Arithmetic d;
-    d = c;
-    d.print();
-    c = 21124;
-    c.print();*/
-    return 0;
+bool Arithmetic::operator==(const Arithmetic& toComp) {
+    unsigned long minSize = min(toComp.size, size);
+    for (int i = 0; i < minSize; i++) {
+        if ((int)toComp.digit[i] != (int)digit[i]) {
+            cout << "here\n";
+            return 0;
+        }
+    }
+    if (minSize < toComp.size) 
+        for (int i = minSize; i < toComp.size; i++)
+            if ((int)toComp.digit[i] != 0)
+                return 0;
+    if (minSize < size)
+        for (int i = minSize; i < size; i++)
+            if ((int)digit[i] != 0)
+                return 0;
+    return 1;
 }

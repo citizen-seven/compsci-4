@@ -1,8 +1,8 @@
 .PHONY: clean run
 
-TARGET = ./arithmetics
+TARGET = ./test
 FLAGS = -Wall -g 
-OBJS = arithmetics.o
+OBJS = test.o arithmetics.o
 DEPS = $(OBJS:.o=.d)
 
 
