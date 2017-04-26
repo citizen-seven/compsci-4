@@ -20,7 +20,6 @@ public:
     ~Arithmetic();
     Arithmetic& operator=(const Arithmetic&);
     Arithmetic operator+(const Arithmetic&);
-    Arithmetic operator+(long);    
     Arithmetic& operator+=(const Arithmetic&);
     Arithmetic operator-(const Arithmetic&);
     Arithmetic operator-(long);

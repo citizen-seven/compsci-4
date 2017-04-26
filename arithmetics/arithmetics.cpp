@@ -6,6 +6,8 @@ Arithmetic::Arithmetic(long double a) {
     size = 16;
     n = (int)ceil(log(a) / log(100));
     digit = new unsigned char [size];
+    for (int i = 0; i < size; i++)
+        digit[i] = 0;
     long int casted = a; //implicit conversion to int
     for (int i = 0; i < n; i++) {
         digit[i] = casted % 100;
@@ -49,16 +51,25 @@ digit = temp;
 */
 
 Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
-    Arithmetic temp;
+    Arithmetic temp = *this;
+    temp += toSum;
+    return temp;
+}
+
+Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
     int mem = 0;
-    temp.n = (n > toSum.n) ? n + 1 : toSum.n + 1;
-    temp.size = (size > toSum.size) ? size: toSum.size;
-    if (temp.n > temp.size)
-        temp.size *= 2;
-    temp.digit = new unsigned char[temp.size];
-    for (int i = 0; i < temp.size; i++)
-        temp.digit[i] = 0;
-    for (int i = 0; i < temp.n; i++) {
+    int nUpd = (n > toSum.n) ? n + 1 : toSum.n + 1;
+    size = (size > toSum.size) ? size: toSum.size;
+    if (nUpd > size) {
+        size *= 2;
+        unsigned char* temp = new unsigned char[size];
+        for (int i = 0; i < size; i++)
+            temp[i] = 0;
+        memcpy(temp, digit, sizeof(unsigned char)*n);
+        delete[] digit;
+        digit = temp;
+    } 
+    for (int i = 0; i < nUpd; i++) {
         int sum = mem;
         if (i < toSum.n)        
             sum += (int)toSum.digit[i];
@@ -66,15 +77,15 @@ Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
             sum += (int)digit[i];
         mem = 0;
         if (sum < 100) 
-            temp.digit[i] = sum;
+            digit[i] = sum;
         else {
             mem = 1;
-            temp.digit[i] = sum % 100;
+            digit[i] = sum % 100;
         }
     }   
-    return temp;
+    n = nUpd;
+    return *this;
 }
-
 
 void Arithmetic::print() {
     int count = 0;
@@ -108,27 +119,30 @@ Arithmetic::~Arithmetic() {
 
 Arithmetic& Arithmetic::operator=(const Arithmetic& a) {
     delete[] digit;
-    digit = new unsigned char[ a.n ];
+    size = a.size;
     n = a.n;
+    digit = new unsigned char[size];
+    for (int i = 0; i < size; i++)
+        digit[i] = 0;
     PRINT("size = %lu", sizeof(unsigned char)*n)
     memcpy(digit, a.digit, sizeof(unsigned char)*n); 
     return *this;
 }
 
 bool Arithmetic::operator==(const Arithmetic& toComp) {
-    unsigned long minSize = min(toComp.size, size);
+    uint64_t minSize = min(toComp.size, size);
     for (int i = 0; i < minSize; i++) {
         if ((int)toComp.digit[i] != (int)digit[i]) {
-            cout << "here\n";
+            cout << "here\n" << (int)toComp.digit[i] << "and" << (int)digit[i];
             return 0;
         }
     }
     if (minSize < toComp.size) 
-        for (int i = minSize; i < toComp.size; i++)
+        for (unsigned long long i = minSize; i < toComp.size; i++)
             if ((int)toComp.digit[i] != 0)
                 return 0;
     if (minSize < size)
-        for (int i = minSize; i < size; i++)
+        for (unsigned long long i = minSize; i < size; i++)
             if ((int)digit[i] != 0)
                 return 0;
     return 1;
