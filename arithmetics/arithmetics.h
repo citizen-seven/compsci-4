@@ -10,8 +10,9 @@
 class Arithmetic {
 private:
     unsigned char* digit;
-    unsigned long long size; //current size
-    unsigned long long n; //current number of elements
+    uint64_t size; //current size
+    uint64_t n; //current number of elements
+    bool sign;
 public:
     Arithmetic();
     Arithmetic(const char*); 

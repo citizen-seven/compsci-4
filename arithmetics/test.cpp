@@ -9,6 +9,8 @@ int main() {
     Arithmetic custom1(input.c_str());
     cin >> input;
     Arithmetic custom2(input.c_str());
+    custom1.print();
+    custom2.print();
     cout << "Their sum is: ";
     custom1 += custom2;
     (custom1).print(); 
@@ -21,5 +23,7 @@ int main() {
     assert(testDouble == Arithmetic("753"));
     a += testDouble;
     assert(a == Arithmetic("100000000000000000000000000000752"));
+    Arithmetic negative("-482");
+    assert(negative == Arithmetic("482"));
     return 0;
 }

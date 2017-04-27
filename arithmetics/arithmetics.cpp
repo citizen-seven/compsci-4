@@ -4,10 +4,15 @@ using namespace std;
 
 Arithmetic::Arithmetic(long double a) { 
     size = 16;
+    sign = 0;
     n = (int)ceil(log(a) / log(100));
     digit = new unsigned char [size];
     for (int i = 0; i < size; i++)
         digit[i] = 0;
+    if (a < 0) {
+        sign = 1;
+        a *= -1;
+    }
     long int casted = a; //implicit conversion to int
     for (int i = 0; i < n; i++) {
         digit[i] = casted % 100;
@@ -19,6 +24,7 @@ Arithmetic::Arithmetic(long double a) {
 Arithmetic::Arithmetic() {
     n = 1;
     size = 16;
+    sign = 0;
     digit = new unsigned char[size];
     for (int i = 0; i < size; i++) 
         digit[i] = 0;
@@ -28,16 +34,23 @@ Arithmetic::Arithmetic() {
 
 Arithmetic::Arithmetic(const char* s) {
     size = 16;
+    sign = 0;
     int len = strlen(s);
-    n = (len % 2) ? (len >> 1) + 1: len >> 1;
+    if (s[0] == '-') {
+        sign = 1;
+        n = (len % 2) ? (len >> 1) : (len >> 1);
+    } else 
+        n = (len % 2) ? (len >> 1) + 1: len >> 1;
     while (size < n) 
         size *= 2;
     digit = new unsigned char[size];
     for (int i = 0; i < size; i++)
         digit[i] = 0;
+
     len--;
     for (int i = 0; i < n; i++) {
         digit[i] = s[len--] - '0';
+        if (sign && len < 1) break;
         if (len < 0) break;
         digit[i] += (s[len--] - '0') * 10;
    }
@@ -90,6 +103,7 @@ Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
 void Arithmetic::print() {
     int count = 0;
     PRINT("len = %d", n)      
+    if (sign) cout << '-';
     for (int i = n; i > 0; i--) {
         if (digit[i-1] || i != n) {
             if (!((int)digit[i-1] / 10) && count)
@@ -105,6 +119,7 @@ void Arithmetic::print() {
 
 Arithmetic::Arithmetic(const Arithmetic& a) {
     size = a.size;
+    sign = a.sign;
     digit = new unsigned char [size];
     n = a.n;
     memcpy(digit, a.digit, sizeof(unsigned char)*size); 
@@ -121,6 +136,7 @@ Arithmetic& Arithmetic::operator=(const Arithmetic& a) {
     delete[] digit;
     size = a.size;
     n = a.n;
+    sign = a.sign;
     digit = new unsigned char[size];
     for (int i = 0; i < size; i++)
         digit[i] = 0;
@@ -131,6 +147,8 @@ Arithmetic& Arithmetic::operator=(const Arithmetic& a) {
 
 bool Arithmetic::operator==(const Arithmetic& toComp) {
     uint64_t minSize = min(toComp.size, size);
+    if (sign != toComp.sign) 
+        return 1;
     for (int i = 0; i < minSize; i++) {
         if ((int)toComp.digit[i] != (int)digit[i]) {
             cout << "here\n" << (int)toComp.digit[i] << "and" << (int)digit[i];
