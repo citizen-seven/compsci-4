@@ -9,11 +9,12 @@ int main() {
     Arithmetic custom1(input.c_str());
     cin >> input;
     Arithmetic custom2(input.c_str());
-    custom1.print();
-    custom2.print();
+    //custom1.print();
+    //custom2.print();
     cout << "Their sum is: ";
     custom1 += custom2;
     (custom1).print(); 
+
     // Tests
     Arithmetic a("99999999999999999999999999999999");
     Arithmetic b("1234");

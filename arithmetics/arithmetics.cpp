@@ -69,7 +69,7 @@ Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
     return temp;
 }
 
-Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
+Arithmetic& Arithmetic::add(const Arithmetic& toSum) {
     int mem = 0;
     int nUpd = (n > toSum.n) ? n + 1 : toSum.n + 1;
     size = (size > toSum.size) ? size: toSum.size;
@@ -97,6 +97,19 @@ Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
         }
     }   
     n = nUpd;
+    return *this;
+}
+
+Arithmetic& Arithmetic::sub(const Arithmetic& toSub) {
+    
+    return *this;
+}
+
+Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
+    if (!(sign^toSum.sign))
+        add(toSum); //the sign is being preserved implicitly
+    else 
+        sub(toSum);
     return *this;
 }
 
@@ -163,5 +176,13 @@ bool Arithmetic::operator==(const Arithmetic& toComp) {
         for (unsigned long long i = minSize; i < size; i++)
             if ((int)digit[i] != 0)
                 return 0;
+    return 1;
+}
+
+bool Arithmetic::operator<(const Arithmetic& toComp) {
+    return 1;
+}
+
+bool Arithmetic::operator>(const Arithmetic& toComp) {
     return 1;
 }
