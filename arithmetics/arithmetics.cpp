@@ -101,7 +101,7 @@ Arithmetic& Arithmetic::add(const Arithmetic& toSum) {
 }
 
 Arithmetic& Arithmetic::sub(const Arithmetic& toSub) {
-    
+        
     return *this;
 }
 
@@ -164,7 +164,6 @@ bool Arithmetic::operator==(const Arithmetic& toComp) {
         return 1;
     for (int i = 0; i < minSize; i++) {
         if ((int)toComp.digit[i] != (int)digit[i]) {
-            cout << "here\n" << (int)toComp.digit[i] << "and" << (int)digit[i];
             return 0;
         }
     }
@@ -180,7 +179,36 @@ bool Arithmetic::operator==(const Arithmetic& toComp) {
 }
 
 bool Arithmetic::operator<(const Arithmetic& toComp) {
-    return 1;
+    uint64_t minSize = min(toComp.size, size);
+    if (sign > toComp.sign) //this is negative, toComp is positive
+        return 1;
+    if (sign < toComp.sign) //this is positive, toComp is negative
+        return 0;
+    bool ret = 1; //now both have the same sign
+    if (*this == toComp)
+        return 0;
+    for (int i = 0; i < minSize; i++) {
+        if ((int)digit[i] > (int)toComp.digit[i]) {
+            ret = 0;
+            break;
+        }
+    }
+    if (minSize < toComp.size) 
+        for (unsigned long long i = minSize; i < toComp.size; i++)
+            if ((int)toComp.digit[i] != 0) {
+                ret = 1;
+                break;
+            }
+    if (minSize < size)
+        for (unsigned long long i = minSize; i < size; i++)
+            if ((int)digit[i] != 0) {
+                ret = 0;
+                break;
+            }
+    if (sign)
+        return !ret;
+    else
+        return ret;
 }
 
 bool Arithmetic::operator>(const Arithmetic& toComp) {

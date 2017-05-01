@@ -11,9 +11,11 @@ int main() {
     Arithmetic custom2(input.c_str());
     //custom1.print();
     //custom2.print();
-    cout << "Their sum is: ";
+    /*cout << "Their sum is: ";
     custom1 += custom2;
-    (custom1).print(); 
+    (custom1).print();*/
+    if (custom1 < custom2)
+       cout << "the first is smaller" << endl; 
 
     // Tests
     Arithmetic a("99999999999999999999999999999999");
@@ -26,5 +28,7 @@ int main() {
     assert(a == Arithmetic("100000000000000000000000000000752"));
     Arithmetic negative("-482");
     assert(negative == Arithmetic("482"));
+    assert(negative < testDouble);
+    assert(b < a);
     return 0;
 }
