@@ -100,9 +100,43 @@ Arithmetic& Arithmetic::add(const Arithmetic& toSum) {
     return *this;
 }
 
-Arithmetic& Arithmetic::sub(const Arithmetic& toSub) {
-        
+Arithmetic& Arithmetic::sub(const Arithmetic& toSub) { //find the absolute difference
+    bool reverse = 0;
+    int loan = 0;
+    Arithmetic minu, subt;
+    if (*this < toSub) {
+        reverse = 1;
+        minu = toSub;
+        subt = *this;
+    } else {
+        minu = *this;
+        subt = toSub;
+    } 
+    int dif = 0;
+    for (int i = 0; i < subt.size; i++) {
+        if (loan && (int)minu.digit[i] > loan) {
+            cout << "here\n";
+            minu.digit[i] = (int)minu.digit[i] - loan;
+            loan = 0;
+        }
+        if ((int)minu.digit[i] < (int)subt.digit[i] && !loan) {
+            loan = 1;
+            digit[i] = 100 + (int)minu.digit[i] - (int)subt.digit[i];
+        }
+        if ((int)minu.digit[i] < (int)subt.digit[i] && loan) 
+            digit[i] = 100 + (int)minu.digit[i] - (int)subt.digit[i];
+        if ((int)minu.digit[i] >= (int)subt.digit[i]) 
+            digit[i] = (int)minu.digit[i] - (int)subt.digit[i];
+    }
+    getn();
     return *this;
+}
+
+void Arithmetic::getn() {
+    for (int i = 0; i < size; i++) {
+        if ((int)digit[i] != 0)
+            n = i+1;
+    }
 }
 
 Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
@@ -110,6 +144,14 @@ Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
         add(toSum); //the sign is being preserved implicitly
     else 
         sub(toSum);
+    return *this;
+}
+
+Arithmetic& Arithmetic::operator-=(const Arithmetic& toSum) {
+    if (!(sign^toSum.sign))
+        sub(toSum); //the sign is being preserved implicitly
+    else 
+        add(toSum);
     return *this;
 }
 
@@ -124,7 +166,8 @@ void Arithmetic::print() {
             else  
                 cout << (int)digit[i-1] << ' ';
             count ++;
-        }
+        } else if (!(int)digit[i] && n)
+            cout << '0';
     }
     cout << endl;
 }

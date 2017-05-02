@@ -13,6 +13,7 @@ private:
     uint64_t size; //current size
     uint64_t n; //current number of elements
     bool sign;
+    void getn();
     Arithmetic& add(const Arithmetic&);
     Arithmetic& sub(const Arithmetic&);
 public:
@@ -24,6 +25,7 @@ public:
     Arithmetic& operator=(const Arithmetic&);
     Arithmetic operator+(const Arithmetic&);
     Arithmetic& operator+=(const Arithmetic&);
+    Arithmetic& operator-=(const Arithmetic&);
     Arithmetic operator-(const Arithmetic&);
     Arithmetic operator-(long);
     Arithmetic operator*(long);

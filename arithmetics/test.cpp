@@ -14,11 +14,7 @@ int main() {
     /*cout << "Their sum is: ";
     custom1 += custom2;
     (custom1).print();*/
-    if (custom1 < custom2)
-       cout << "the first is smaller" << endl; 
-    if (custom1 > custom2)
-       cout << "the first is greater" << endl; 
-
+    (custom1 -= custom2).print();
     // Tests
     Arithmetic a("99999999999999999999999999999999");
     Arithmetic b("1234");
