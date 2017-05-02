@@ -205,12 +205,35 @@ bool Arithmetic::operator<(const Arithmetic& toComp) {
                 ret = 0;
                 break;
             }
-    if (sign)
-        return !ret;
-    else
-        return ret;
+    return  sign ? !ret : ret;
 }
 
 bool Arithmetic::operator>(const Arithmetic& toComp) {
-    return 1;
+    uint64_t minSize = min(toComp.size, size);
+    if (sign > toComp.sign) //this is negative, toComp is positive
+        return 0;
+    if (sign < toComp.sign) //this is positive, toComp is negative
+        return 1;
+    bool ret = 1; //now both have the same sign
+    if (*this == toComp)
+        return 0;
+    for (int i = 0; i < minSize; i++) {
+        if ((int)digit[i] < (int)toComp.digit[i]) {
+            ret = 0;
+            break;
+        }
+    }
+    if (minSize < toComp.size) 
+        for (unsigned long long i = minSize; i < toComp.size; i++)
+            if ((int)toComp.digit[i] != 0) {
+                ret = 0;
+                break;
+            }
+    if (minSize < size)
+        for (unsigned long long i = minSize; i < size; i++)
+            if ((int)digit[i] != 0) {
+                ret = 1;
+                break;
+            }
+    return  sign ? !ret : ret;
 }

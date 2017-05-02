@@ -16,19 +16,27 @@ int main() {
     (custom1).print();*/
     if (custom1 < custom2)
        cout << "the first is smaller" << endl; 
+    if (custom1 > custom2)
+       cout << "the first is greater" << endl; 
 
     // Tests
     Arithmetic a("99999999999999999999999999999999");
     Arithmetic b("1234");
     assert(a+b == Arithmetic("100000000000000000000000000001233"));
+
     Arithmetic testDouble;
     testDouble = 753.381103;
     assert(testDouble == Arithmetic("753"));
+
     a += testDouble;
     assert(a == Arithmetic("100000000000000000000000000000752"));
+    
     Arithmetic negative("-482");
     assert(negative == Arithmetic("482"));
+
     assert(negative < testDouble);
     assert(b < a);
+    assert(a > b);
+    assert(testDouble > negative);
     return 0;
 }
