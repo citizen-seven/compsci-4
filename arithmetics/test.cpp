@@ -14,11 +14,14 @@ int main() {
     /*cout << "Their sum is: ";
     custom1 += custom2;
     (custom1).print();*/
-    (custom1 -= custom2).print();
+    cout << "Their difference is: ";
+    (custom1 - custom2).print();
+
     // Tests
     Arithmetic a("99999999999999999999999999999999");
     Arithmetic b("1234");
     assert(a+b == Arithmetic("100000000000000000000000000001233"));
+    assert(a-b == Arithmetic("99999999999999999999999999998765"));
 
     Arithmetic testDouble;
     testDouble = 753.381103;
@@ -29,6 +32,8 @@ int main() {
     
     Arithmetic negative("-482");
     assert(negative == Arithmetic("482"));
+    assert(b - negative == Arithmetic("1716"));
+    assert(negative - b == Arithmetic("-1716"));
 
     assert(negative < testDouble);
     assert(b < a);

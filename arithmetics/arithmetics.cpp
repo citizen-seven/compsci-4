@@ -69,6 +69,12 @@ Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
     return temp;
 }
 
+Arithmetic Arithmetic::operator-(const Arithmetic& toSub) {
+    Arithmetic temp = *this;
+    temp -= toSub;
+    return temp;
+}
+
 Arithmetic& Arithmetic::add(const Arithmetic& toSum) {
     int mem = 0;
     int nUpd = (n > toSum.n) ? n + 1 : toSum.n + 1;
@@ -100,11 +106,17 @@ Arithmetic& Arithmetic::add(const Arithmetic& toSum) {
     return *this;
 }
 
+Arithmetic Arithmetic::abs(const Arithmetic& toAbs) {
+    Arithmetic temp = toAbs;
+    temp.sign = 0;
+    return temp;
+}
+
 Arithmetic& Arithmetic::sub(const Arithmetic& toSub) { //find the absolute difference
     bool reverse = 0;
     int loan = 0;
     Arithmetic minu, subt;
-    if (*this < toSub) {
+    if (abs(*this) < abs(toSub)) {
         reverse = 1;
         minu = toSub;
         subt = *this;
@@ -112,10 +124,8 @@ Arithmetic& Arithmetic::sub(const Arithmetic& toSub) { //find the absolute diffe
         minu = *this;
         subt = toSub;
     } 
-    int dif = 0;
     for (int i = 0; i < subt.size; i++) {
         if (loan && (int)minu.digit[i] > loan) {
-            cout << "here\n";
             minu.digit[i] = (int)minu.digit[i] - loan;
             loan = 0;
         }
@@ -147,15 +157,19 @@ Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
     return *this;
 }
 
-Arithmetic& Arithmetic::operator-=(const Arithmetic& toSum) {
-    if (!(sign^toSum.sign))
-        sub(toSum); //the sign is being preserved implicitly
+
+Arithmetic& Arithmetic::operator-=(const Arithmetic& toSub) {
+    if (!(sign^toSub.sign)) {
+        sign = !(*this >= toSub);
+        sub(toSub); 
+    }
     else 
-        add(toSum);
+        add(toSub);
     return *this;
 }
 
-void Arithmetic::print() {
+
+void Arithmetic::print() const {
     int count = 0;
     PRINT("len = %d", n)      
     if (sign) cout << '-';
@@ -166,7 +180,7 @@ void Arithmetic::print() {
             else  
                 cout << (int)digit[i-1] << ' ';
             count ++;
-        } else if (!(int)digit[i] && n)
+        } else if (!(int)digit[0] && i == n)
             cout << '0';
     }
     cout << endl;
@@ -251,6 +265,13 @@ bool Arithmetic::operator<(const Arithmetic& toComp) {
     return  sign ? !ret : ret;
 }
 
+bool Arithmetic::operator<=(const Arithmetic& toComp) {
+    if (*this == toComp || *this < toComp)
+        return 1;
+    else return 0;
+}
+
+
 bool Arithmetic::operator>(const Arithmetic& toComp) {
     uint64_t minSize = min(toComp.size, size);
     if (sign > toComp.sign) //this is negative, toComp is positive
@@ -280,3 +301,10 @@ bool Arithmetic::operator>(const Arithmetic& toComp) {
             }
     return  sign ? !ret : ret;
 }
+
+bool Arithmetic::operator>=(const Arithmetic& toComp) {
+    if (*this == toComp || *this > toComp)
+        return 1;
+    else return 0;
+}
+

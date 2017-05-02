@@ -14,6 +14,7 @@ private:
     uint64_t n; //current number of elements
     bool sign;
     void getn();
+    Arithmetic abs(const Arithmetic&);
     Arithmetic& add(const Arithmetic&);
     Arithmetic& sub(const Arithmetic&);
 public:
@@ -31,6 +32,8 @@ public:
     Arithmetic operator*(long);
     bool operator==(const Arithmetic&);
     bool operator>(const Arithmetic&);
+    bool operator>=(const Arithmetic&);
     bool operator<(const Arithmetic&);
-    void print();
+    bool operator<=(const Arithmetic&);
+    void print() const;
 };
