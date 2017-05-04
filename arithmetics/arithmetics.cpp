@@ -114,7 +114,7 @@ Arithmetic Arithmetic::abs(const Arithmetic& toAbs) {
 
 Arithmetic& Arithmetic::sub(const Arithmetic& toSub) { //find the absolute difference
     bool reverse = 0;
-    int loan = 0;
+    int carry = 0;
     Arithmetic minu, subt;
     if (abs(*this) < abs(toSub)) {
         reverse = 1;
@@ -124,19 +124,29 @@ Arithmetic& Arithmetic::sub(const Arithmetic& toSub) { //find the absolute diffe
         minu = *this;
         subt = toSub;
     } 
-    for (int i = 0; i < subt.size; i++) {
-        if (loan && (int)minu.digit[i] > loan) {
-            minu.digit[i] = (int)minu.digit[i] - loan;
-            loan = 0;
-        }
-        if ((int)minu.digit[i] < (int)subt.digit[i] && !loan) {
-            loan = 1;
-            digit[i] = 100 + (int)minu.digit[i] - (int)subt.digit[i];
-        }
-        if ((int)minu.digit[i] < (int)subt.digit[i] && loan) 
-            digit[i] = 100 + (int)minu.digit[i] - (int)subt.digit[i];
-        if ((int)minu.digit[i] >= (int)subt.digit[i]) 
-            digit[i] = (int)minu.digit[i] - (int)subt.digit[i];
+    for (int i = 0; i < minu.size; i++) {
+        if (carry) {
+            if ((int)minu.digit[i] >= carry) {
+                minu.digit[i] = (int)minu.digit[i] - carry;
+                carry = 0;
+            } else {
+                minu.digit[i] = 100 - carry;
+                carry = 1;
+            }
+            if ((int)minu.digit[i] >= ((i > subt.size - 1) ? 0 : (int)subt.digit[i])) {
+                digit[i] = (int)minu.digit[i] - ((i > subt.size - 1) ? 0 : (int)subt.digit[i]);
+            } else {
+                digit[i] = 100 + minu.digit[i] - carry - ((i > subt.size - 1) ? 0 : subt.digit[i]);
+                carry = 1;
+            } 
+        } else {   
+            if ((int)minu.digit[i] >= ((i > subt.size - 1) ? 0 : (int)subt.digit[i])) {
+                digit[i] = (int)minu.digit[i] - ((i > subt.size - 1) ? 0 : (int)subt.digit[i]);
+            } else {
+                carry = 1;
+                digit[i] = 100 + (int)minu.digit[i] - ((i > (int)subt.digit[i]) ? 0 : (int)subt.digit[i]);
+            } 
+        }    
     }
     getn();
     return *this;
@@ -160,7 +170,7 @@ Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
 
 Arithmetic& Arithmetic::operator-=(const Arithmetic& toSub) {
     if (!(sign^toSub.sign)) {
-        sign = !(*this >= toSub);
+        sign = !((*this) >= toSub);
         sub(toSub); 
     }
     else 
@@ -284,8 +294,8 @@ bool Arithmetic::operator>(const Arithmetic& toComp) {
     for (int i = 0; i < minSize; i++) {
         if ((int)digit[i] < (int)toComp.digit[i]) {
             ret = 0;
-            break;
         }
+        ret = 1;
     }
     if (minSize < toComp.size) 
         for (unsigned long long i = minSize; i < toComp.size; i++)
@@ -303,8 +313,8 @@ bool Arithmetic::operator>(const Arithmetic& toComp) {
 }
 
 bool Arithmetic::operator>=(const Arithmetic& toComp) {
-    if (*this == toComp || *this > toComp)
+    if ((*this) == toComp || (*this) > toComp)
         return 1;
-    else return 0;
+    return 0;
 }
 

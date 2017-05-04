@@ -15,7 +15,7 @@ int main() {
     custom1 += custom2;
     (custom1).print();*/
     cout << "Their difference is: ";
-    (custom1 - custom2).print();
+    (custom1 -= custom2).print();
 
     // Tests
     Arithmetic a("99999999999999999999999999999999");
