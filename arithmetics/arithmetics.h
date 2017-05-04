@@ -36,4 +36,5 @@ public:
     bool operator<(const Arithmetic&);
     bool operator<=(const Arithmetic&);
     void print() const;
+    void print_real() const;
 };

@@ -9,15 +9,15 @@ int main() {
     Arithmetic custom1(input.c_str());
     cin >> input;
     Arithmetic custom2(input.c_str());
-    //custom1.print();
-    //custom2.print();
+    //custom1.print_real();
+    //custom2.print_real();
     /*cout << "Their sum is: ";
     custom1 += custom2;
-    (custom1).print();*/
-    cout << "Their difference is: ";
-    (custom1 -= custom2).print();
+    (custom1).print_real();*/
+    
+    (custom1 - custom2).print();
 
-    // Tests
+    // Tests 
     Arithmetic a("99999999999999999999999999999999");
     Arithmetic b("1234");
     assert(a+b == Arithmetic("100000000000000000000000000001233"));

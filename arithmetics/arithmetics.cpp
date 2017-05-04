@@ -56,13 +56,6 @@ Arithmetic::Arithmetic(const char* s) {
    }
 }
 
-/*
-unsigned char* temp = new unsigned char[size];
-memcpy(temp, digit, sizeof(unsigned char)*n); 
-delete[] digit;
-digit = temp;
-*/
-
 Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
     Arithmetic temp = *this;
     temp += toSum;
@@ -170,7 +163,7 @@ Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
 
 Arithmetic& Arithmetic::operator-=(const Arithmetic& toSub) {
     if (!(sign^toSub.sign)) {
-        sign = !((*this) >= toSub);
+        sign = !(*this >= toSub);
         sub(toSub); 
     }
     else 
@@ -178,10 +171,15 @@ Arithmetic& Arithmetic::operator-=(const Arithmetic& toSub) {
     return *this;
 }
 
+void Arithmetic::print_real() const {
+    for (int i = 0; i < size; i++) {
+        cout << (int)digit[i] << " ";
+    }
+    cout << endl;
+}
 
 void Arithmetic::print() const {
     int count = 0;
-    PRINT("len = %d", n)      
     if (sign) cout << '-';
     for (int i = n; i > 0; i--) {
         if (digit[i-1] || i != n) {
@@ -245,31 +243,35 @@ bool Arithmetic::operator==(const Arithmetic& toComp) {
     return 1;
 }
 
+
 bool Arithmetic::operator<(const Arithmetic& toComp) {
     uint64_t minSize = min(toComp.size, size);
     if (sign > toComp.sign) //this is negative, toComp is positive
         return 1;
     if (sign < toComp.sign) //this is positive, toComp is negative
         return 0;
-    bool ret = 1; //now both have the same sign
+    bool ret = 0; //now both have the same sign
     if (*this == toComp)
         return 0;
-    for (int i = 0; i < minSize; i++) {
-        if ((int)digit[i] > (int)toComp.digit[i]) {
+    for (int i = minSize - 1; i >= 0; i--) {
+        if ((int)digit[i] < (int)toComp.digit[i]) {
+            ret = 1;
+            break;
+        } else if ((int)digit[i] > (int)toComp.digit[i]) {
             ret = 0;
             break;
         }
     }
-    if (minSize < toComp.size) 
-        for (unsigned long long i = minSize; i < toComp.size; i++)
-            if ((int)toComp.digit[i] != 0) {
-                ret = 1;
-                break;
-            }
     if (minSize < size)
-        for (unsigned long long i = minSize; i < size; i++)
+        for (unsigned long long i = minSize; i < size - 1; i++)
             if ((int)digit[i] != 0) {
                 ret = 0;
+                break;
+            }
+    if (minSize < toComp.size)
+        for (unsigned long long i = minSize; i < toComp.size - 1; i++)
+            if ((int)toComp.digit[i] != 0) {
+                ret = 1;
                 break;
             }
     return  sign ? !ret : ret;
@@ -288,32 +290,35 @@ bool Arithmetic::operator>(const Arithmetic& toComp) {
         return 0;
     if (sign < toComp.sign) //this is positive, toComp is negative
         return 1;
-    bool ret = 1; //now both have the same sign
+    bool ret = 0; //now both have the same sign
     if (*this == toComp)
         return 0;
-    for (int i = 0; i < minSize; i++) {
-        if ((int)digit[i] < (int)toComp.digit[i]) {
+    for (int i = minSize - 1; i >= 0; i--) {
+        if ((int)digit[i] > (int)toComp.digit[i]) {
+            ret = 1;
+            break;
+        } else if ((int)digit[i] < (int)toComp.digit[i]) {
             ret = 0;
+            break;
         }
-        ret = 1;
     }
-    if (minSize < toComp.size) 
-        for (unsigned long long i = minSize; i < toComp.size; i++)
-            if ((int)toComp.digit[i] != 0) {
-                ret = 0;
-                break;
-            }
     if (minSize < size)
-        for (unsigned long long i = minSize; i < size; i++)
+        for (unsigned long long i = minSize; i < size - 1; i++)
             if ((int)digit[i] != 0) {
                 ret = 1;
+                break;
+            }
+    if (minSize < toComp.size)
+        for (unsigned long long i = minSize; i < toComp.size - 1; i++)
+            if ((int)toComp.digit[i] != 0) {
+                ret = 0;
                 break;
             }
     return  sign ? !ret : ret;
 }
 
 bool Arithmetic::operator>=(const Arithmetic& toComp) {
-    if ((*this) == toComp || (*this) > toComp)
+    if (*this == toComp || *this > toComp)
         return 1;
     return 0;
 }
