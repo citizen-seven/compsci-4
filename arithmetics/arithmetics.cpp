@@ -2,6 +2,53 @@
 
 using namespace std;
 
+void Arithmetic::getn() {
+    for (int i = 0; i < size; i++) {
+        if ((int)digit[i] != 0)
+            n = i+1;
+    }
+}
+
+Arithmetic::Arithmetic() {
+    n = 1;
+    size = 16;
+    sign = 0;
+    digit = new unsigned char[size];
+    for (int i = 0; i < size; i++) 
+        digit[i] = 0;
+}
+
+Arithmetic::Arithmetic(const char* s) {
+    size = 16;
+    sign = 0;
+    int len = strlen(s);
+    if (s[0] == '-') {
+        sign = 1;
+        n = (len % 2) ? (len >> 1) : (len >> 1);
+    } else 
+        n = (len % 2) ? (len >> 1) + 1: len >> 1;
+    while (size < n) 
+        size *= 2;
+    digit = new unsigned char[size];
+    for (int i = 0; i < size; i++)
+        digit[i] = 0;
+    len--;
+    for (int i = 0; i < n; i++) {
+        digit[i] = s[len--] - '0';
+        if (sign && len < 1) break;
+        if (len < 0) break;
+        digit[i] += (s[len--] - '0') * 10;
+   }
+}
+
+Arithmetic::Arithmetic(const Arithmetic& a) {
+    size = a.size;
+    sign = a.sign;
+    digit = new unsigned char [size];
+    n = a.n;
+    memcpy(digit, a.digit, sizeof(unsigned char)*size); 
+}
+
 Arithmetic::Arithmetic(long double a) { 
     size = 16;
     sign = 0;
@@ -20,51 +67,146 @@ Arithmetic::Arithmetic(long double a) {
     }
 }
 
-
-Arithmetic::Arithmetic() {
-    n = 1;
-    size = 16;
-    sign = 0;
-    digit = new unsigned char[size];
-    for (int i = 0; i < size; i++) 
-        digit[i] = 0;
-    PRINT("Constructor")
+Arithmetic::~Arithmetic() {
+    delete[] digit;
 }
 
+void Arithmetic::print_real() const {
+    for (int i = 0; i < size; i++) {
+        cout << (int)digit[i] << " ";
+    }
+    cout << endl;
+}
 
-Arithmetic::Arithmetic(const char* s) {
-    size = 16;
-    sign = 0;
-    int len = strlen(s);
-    if (s[0] == '-') {
-        sign = 1;
-        n = (len % 2) ? (len >> 1) : (len >> 1);
-    } else 
-        n = (len % 2) ? (len >> 1) + 1: len >> 1;
-    while (size < n) 
-        size *= 2;
+void Arithmetic::print() const {
+    int count = 0;
+    if (sign) cout << '-';
+    for (int i = n; i > 0; i--) {
+        if (digit[i-1] || i != n) {
+            if (!((int)digit[i-1] / 10) && count)
+                cout << '0' << (int)digit[i-1] << ' ';
+            else  
+                cout << (int)digit[i-1] << ' ';
+            count ++;
+        } else if (!(int)digit[0] && i == n)
+            cout << '0';
+    }
+    cout << endl;
+}
+
+bool Arithmetic::operator==(const Arithmetic& toComp) {
+    uint64_t minSize = min(toComp.size, size);
+    if (sign != toComp.sign) 
+        return 1;
+    for (int i = 0; i < minSize; i++) {
+        if ((int)toComp.digit[i] != (int)digit[i]) {
+            return 0;
+        }
+    }
+    if (minSize < toComp.size) 
+        for (unsigned long long i = minSize; i < toComp.size; i++)
+            if ((int)toComp.digit[i] != 0)
+                return 0;
+    if (minSize < size)
+        for (unsigned long long i = minSize; i < size; i++)
+            if ((int)digit[i] != 0)
+                return 0;
+    return 1;
+}
+
+bool Arithmetic::operator<(const Arithmetic& toComp) {
+    uint64_t minSize = min(toComp.size, size);
+    if (sign > toComp.sign) //this is negative, toComp is positive
+        return 1;
+    if (sign < toComp.sign) //this is positive, toComp is negative
+        return 0;
+    bool ret = 0; //now both have the same sign
+    if (*this == toComp)
+        return 0;
+    for (int i = minSize - 1; i >= 0; i--) {
+        if ((int)digit[i] < (int)toComp.digit[i]) {
+            ret = 1;
+            break;
+        } else if ((int)digit[i] > (int)toComp.digit[i]) {
+            ret = 0;
+            break;
+        }
+    }
+    if (minSize < size)
+        for (unsigned long long i = minSize; i < size - 1; i++)
+            if ((int)digit[i] != 0) {
+                ret = 0;
+                break;
+            }
+    if (minSize < toComp.size)
+        for (unsigned long long i = minSize; i < toComp.size - 1; i++)
+            if ((int)toComp.digit[i] != 0) {
+                ret = 1;
+                break;
+            }
+    return  sign ? !ret : ret;
+}
+
+bool Arithmetic::operator>(const Arithmetic& toComp) {
+    uint64_t minSize = min(toComp.size, size);
+    if (sign > toComp.sign) //this is negative, toComp is positive
+        return 0;
+    if (sign < toComp.sign) //this is positive, toComp is negative
+        return 1;
+    bool ret = 0; //now both have the same sign
+    if (*this == toComp)
+        return 0;
+    for (int i = minSize - 1; i >= 0; i--) {
+        if ((int)digit[i] > (int)toComp.digit[i]) {
+            ret = 1;
+            break;
+        } else if ((int)digit[i] < (int)toComp.digit[i]) {
+            ret = 0;
+            break;
+        }
+    }
+    if (minSize < size)
+        for (unsigned long long i = minSize; i < size - 1; i++)
+            if ((int)digit[i] != 0) {
+                ret = 1;
+                break;
+            }
+    if (minSize < toComp.size)
+        for (unsigned long long i = minSize; i < toComp.size - 1; i++)
+            if ((int)toComp.digit[i] != 0) {
+                ret = 0;
+                break;
+            }
+    return  sign ? !ret : ret;
+}
+
+bool Arithmetic::operator<=(const Arithmetic& toComp) {
+    if (*this == toComp || *this < toComp)
+        return 1;
+    else return 0;
+}
+
+bool Arithmetic::operator>=(const Arithmetic& toComp) {
+    if (*this == toComp || *this > toComp)
+        return 1;
+    return 0;
+}
+
+Arithmetic& Arithmetic::operator=(const Arithmetic& a) {
+    delete[] digit;
+    size = a.size;
+    n = a.n;
+    sign = a.sign;
     digit = new unsigned char[size];
     for (int i = 0; i < size; i++)
         digit[i] = 0;
-
-    len--;
-    for (int i = 0; i < n; i++) {
-        digit[i] = s[len--] - '0';
-        if (sign && len < 1) break;
-        if (len < 0) break;
-        digit[i] += (s[len--] - '0') * 10;
-   }
+    memcpy(digit, a.digit, sizeof(unsigned char)*n); 
+    return *this;
 }
 
-Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
-    Arithmetic temp = *this;
-    temp += toSum;
-    return temp;
-}
-
-Arithmetic Arithmetic::operator-(const Arithmetic& toSub) {
-    Arithmetic temp = *this;
-    temp -= toSub;
+Arithmetic Arithmetic::abs(const Arithmetic& toAbs) {
+    Arithmetic temp = toAbs;
+    temp.sign = 0;
     return temp;
 }
 
@@ -97,12 +239,6 @@ Arithmetic& Arithmetic::add(const Arithmetic& toSum) {
     }   
     n = nUpd;
     return *this;
-}
-
-Arithmetic Arithmetic::abs(const Arithmetic& toAbs) {
-    Arithmetic temp = toAbs;
-    temp.sign = 0;
-    return temp;
 }
 
 Arithmetic& Arithmetic::sub(const Arithmetic& toSub) { //find the absolute difference
@@ -145,11 +281,10 @@ Arithmetic& Arithmetic::sub(const Arithmetic& toSub) { //find the absolute diffe
     return *this;
 }
 
-void Arithmetic::getn() {
-    for (int i = 0; i < size; i++) {
-        if ((int)digit[i] != 0)
-            n = i+1;
-    }
+Arithmetic Arithmetic::operator+(const Arithmetic& toSum) {
+    Arithmetic temp = *this;
+    temp += toSum;
+    return temp;
 }
 
 Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
@@ -160,6 +295,11 @@ Arithmetic& Arithmetic::operator+=(const Arithmetic& toSum) {
     return *this;
 }
 
+Arithmetic Arithmetic::operator-(const Arithmetic& toSub) {
+    Arithmetic temp = *this;
+    temp -= toSub;
+    return temp;
+}
 
 Arithmetic& Arithmetic::operator-=(const Arithmetic& toSub) {
     if (!(sign^toSub.sign)) {
@@ -170,156 +310,3 @@ Arithmetic& Arithmetic::operator-=(const Arithmetic& toSub) {
         add(toSub);
     return *this;
 }
-
-void Arithmetic::print_real() const {
-    for (int i = 0; i < size; i++) {
-        cout << (int)digit[i] << " ";
-    }
-    cout << endl;
-}
-
-void Arithmetic::print() const {
-    int count = 0;
-    if (sign) cout << '-';
-    for (int i = n; i > 0; i--) {
-        if (digit[i-1] || i != n) {
-            if (!((int)digit[i-1] / 10) && count)
-                cout << '0' << (int)digit[i-1] << ' ';
-            else  
-                cout << (int)digit[i-1] << ' ';
-            count ++;
-        } else if (!(int)digit[0] && i == n)
-            cout << '0';
-    }
-    cout << endl;
-}
-
-
-Arithmetic::Arithmetic(const Arithmetic& a) {
-    size = a.size;
-    sign = a.sign;
-    digit = new unsigned char [size];
-    n = a.n;
-    memcpy(digit, a.digit, sizeof(unsigned char)*size); 
-}
-
-
-Arithmetic::~Arithmetic() {
-    delete[] digit;
-    PRINT("Destructor")
-}
-
-
-Arithmetic& Arithmetic::operator=(const Arithmetic& a) {
-    delete[] digit;
-    size = a.size;
-    n = a.n;
-    sign = a.sign;
-    digit = new unsigned char[size];
-    for (int i = 0; i < size; i++)
-        digit[i] = 0;
-    PRINT("size = %lu", sizeof(unsigned char)*n)
-    memcpy(digit, a.digit, sizeof(unsigned char)*n); 
-    return *this;
-}
-
-bool Arithmetic::operator==(const Arithmetic& toComp) {
-    uint64_t minSize = min(toComp.size, size);
-    if (sign != toComp.sign) 
-        return 1;
-    for (int i = 0; i < minSize; i++) {
-        if ((int)toComp.digit[i] != (int)digit[i]) {
-            return 0;
-        }
-    }
-    if (minSize < toComp.size) 
-        for (unsigned long long i = minSize; i < toComp.size; i++)
-            if ((int)toComp.digit[i] != 0)
-                return 0;
-    if (minSize < size)
-        for (unsigned long long i = minSize; i < size; i++)
-            if ((int)digit[i] != 0)
-                return 0;
-    return 1;
-}
-
-
-bool Arithmetic::operator<(const Arithmetic& toComp) {
-    uint64_t minSize = min(toComp.size, size);
-    if (sign > toComp.sign) //this is negative, toComp is positive
-        return 1;
-    if (sign < toComp.sign) //this is positive, toComp is negative
-        return 0;
-    bool ret = 0; //now both have the same sign
-    if (*this == toComp)
-        return 0;
-    for (int i = minSize - 1; i >= 0; i--) {
-        if ((int)digit[i] < (int)toComp.digit[i]) {
-            ret = 1;
-            break;
-        } else if ((int)digit[i] > (int)toComp.digit[i]) {
-            ret = 0;
-            break;
-        }
-    }
-    if (minSize < size)
-        for (unsigned long long i = minSize; i < size - 1; i++)
-            if ((int)digit[i] != 0) {
-                ret = 0;
-                break;
-            }
-    if (minSize < toComp.size)
-        for (unsigned long long i = minSize; i < toComp.size - 1; i++)
-            if ((int)toComp.digit[i] != 0) {
-                ret = 1;
-                break;
-            }
-    return  sign ? !ret : ret;
-}
-
-bool Arithmetic::operator<=(const Arithmetic& toComp) {
-    if (*this == toComp || *this < toComp)
-        return 1;
-    else return 0;
-}
-
-
-bool Arithmetic::operator>(const Arithmetic& toComp) {
-    uint64_t minSize = min(toComp.size, size);
-    if (sign > toComp.sign) //this is negative, toComp is positive
-        return 0;
-    if (sign < toComp.sign) //this is positive, toComp is negative
-        return 1;
-    bool ret = 0; //now both have the same sign
-    if (*this == toComp)
-        return 0;
-    for (int i = minSize - 1; i >= 0; i--) {
-        if ((int)digit[i] > (int)toComp.digit[i]) {
-            ret = 1;
-            break;
-        } else if ((int)digit[i] < (int)toComp.digit[i]) {
-            ret = 0;
-            break;
-        }
-    }
-    if (minSize < size)
-        for (unsigned long long i = minSize; i < size - 1; i++)
-            if ((int)digit[i] != 0) {
-                ret = 1;
-                break;
-            }
-    if (minSize < toComp.size)
-        for (unsigned long long i = minSize; i < toComp.size - 1; i++)
-            if ((int)toComp.digit[i] != 0) {
-                ret = 0;
-                break;
-            }
-    return  sign ? !ret : ret;
-}
-
-bool Arithmetic::operator>=(const Arithmetic& toComp) {
-    if (*this == toComp || *this > toComp)
-        return 1;
-    return 0;
-}
-

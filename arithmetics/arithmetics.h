@@ -4,7 +4,6 @@
 #include <string>
 #include <cstring>
 #include <cstdlib>
-#include "tools.h"
 #include <cassert>
 
 class Arithmetic {
@@ -17,12 +16,19 @@ private:
     Arithmetic abs(const Arithmetic&);
     Arithmetic& add(const Arithmetic&);
     Arithmetic& sub(const Arithmetic&);
+    void print_real() const;
 public:
     Arithmetic();
     Arithmetic(const char*); 
     Arithmetic(const Arithmetic&);
     Arithmetic(long double);
     ~Arithmetic();
+    void print() const;
+    bool operator==(const Arithmetic&);
+    bool operator>(const Arithmetic&);
+    bool operator>=(const Arithmetic&);
+    bool operator<(const Arithmetic&);
+    bool operator<=(const Arithmetic&);
     Arithmetic& operator=(const Arithmetic&);
     Arithmetic operator+(const Arithmetic&);
     Arithmetic& operator+=(const Arithmetic&);
@@ -30,11 +36,4 @@ public:
     Arithmetic operator-(const Arithmetic&);
     Arithmetic operator-(long);
     Arithmetic operator*(long);
-    bool operator==(const Arithmetic&);
-    bool operator>(const Arithmetic&);
-    bool operator>=(const Arithmetic&);
-    bool operator<(const Arithmetic&);
-    bool operator<=(const Arithmetic&);
-    void print() const;
-    void print_real() const;
 };
