@@ -1,8 +1,8 @@
 .PHONY: clean run
 
-TARGET = ./example
+TARGET = ./example2
 FLAGS = -w -g `wx-config --cflags` 
-OBJS = example.o
+OBJS = example2.o
 DEPS = $(OBJS:.o=.d)
 
 
